@@ -1,9 +1,0 @@
-{
-  "name": "force-directed-graph",
-  "main": "force-directed-graph.js",
-  "version": "124.0.0",
-  "author": {
-    "name": "kwangwook-kwon",
-    "url": "https://beta.observablehq.com/@kwangwook-kwon"
-  }
-}
