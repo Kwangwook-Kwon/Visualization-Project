@@ -2,12 +2,30 @@
 <meta charset="utf-8">
 <title>D3 Force-Directed Graph</title>
 <link rel="stylesheet" type="text/css" href="https://unpkg.com/@observablehq/notebook-inspector@1/dist/notebook-inspector-style.css">
+
 <body>
-<script type="module">
 
-import {Inspector, Runtime} from "https://unpkg.com/@observablehq/notebook-runtime@1?module";
-import notebook from "./force-directed-graph.js";
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script>
+        let file_list= [];
+        //Read File list to array
+        d3.csv("tweet_list", function(data) {
+                file_list.push(data.number);
+        });
+        console.log(file_list);
 
-Runtime.load(notebook, Inspector.into(document.body));
 
-</script>
+        
+        d3.json("./Twitter_Data/RetweetNew/9286").then(test)
+        function test(data) {
+            console.log(data);
+        }
+    </script>
+
+    <script type="module">
+        import { Inspector, Runtime } from "https://unpkg.com/@observablehq/notebook-runtime@1?module";
+        import notebook from "./force-directed-graph.js";
+        Runtime.load(notebook, Inspector.into(document.body));
+    </script>
+
+</body>
