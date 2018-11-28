@@ -6,21 +6,6 @@
 <body>
 
     <script src="https://d3js.org/d3.v5.min.js"></script>
-    <script>
-        let file_list= [];
-        //Read File list to array
-        d3.csv("tweet_list", function(data) {
-                file_list.push(data.number);
-        });
-        console.log(file_list);
-
-
-
-        d3.json("./Twitter_Data/RetweetNew/9286").then(test)
-        function test(data) {
-            console.log(data);
-        }
-    </script>
     <canvas width="960" height="960"></canvas>
     <script src="force-directed-graph.js"></script>
 
