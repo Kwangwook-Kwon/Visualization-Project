@@ -1,3 +1,5 @@
+d3.select('body').append('svg').attr('width', 2000).attr('height',2000)
+
 let file_list = [];
 //Read File list to array
 d3.csv("tweet_list", function (data) {
@@ -37,22 +39,24 @@ function draw_force_directed_graph(data) {
         return k;
     }
   }
-  console.log(links);
-  var svg = d3.select("svg"),
-    width = +svg.attr("width"),
-    height = +svg.attr("height");
+
+  var svg = d3.select('svg')
   var color = d3.scaleOrdinal(d3.schemeCategory20);
   var simulation = d3.forceSimulation()
-    .force("link", d3.forceLink().id(function (d) { return d.id; }))
+  .force("x", d3.forceX())
+  .force("y", d3.forceY())
+    //.force("link", d3.forceLink().id(function (d) { return d.id; }))
+    //.force("link", d3.forceLink(links).distance(20).strength(1))
     .force("charge", d3.forceManyBody())
-    .force("center", d3.forceCenter(width / 2, height / 2));
+    .force("center", d3.forceCenter(600,600));
+    console.log(simulation);
 
   var link = svg.append("g")
     .attr("class", "links")
     .selectAll("line")
     .data(links)
     .enter().append("line")
-    .attr("stroke-width", function (d) { return Math.sqrt(d.value); });
+    .attr("stroke-width", 2);
 
   var node = svg.append("g")
     .attr("class", "nodes")
@@ -71,8 +75,9 @@ function draw_force_directed_graph(data) {
   simulation
     .nodes(nodes)
     .on("tick", ticked);
-  simulation.force("link")
-    .links(links);
+  simulation//.force("link")
+    //.links(links)
+    .force("link", d3.forceLink(links).distance(10).strength(1))
   function ticked() {
     link
       .attr("x1", function (d) { return d.source.x; })
