@@ -5,17 +5,24 @@ let file_list = [];
 d3.csv("tweet_list", function (data) {
   file_list.push(data.number);
 });
+d3.json("./Twitter_Data/Metadata/131010.json",function (data){
+  for(let k = 0 ; k<data.length ; k++ ){
+    if(data[k].id == 971857989211770880)
+      console.log("True")
+  }
+  console.log(data)
+})
 
 
 let tweet_data = [];
 let key = [];
-d3.json("./Twitter_Data/RetweetNew/163819",
+d3.json("./Twitter_Data/RetweetNew/131010",
 
   function draw_force_directed_graph(data) {
 
     let key = Object.keys(data)
-    console.log(key)
-    console.log(data[key[0]])
+    //console.log(key)
+    console.log(data)
 
     let nodes = d3.range(key.length).map(function (i) {
       return {
@@ -29,17 +36,7 @@ d3.json("./Twitter_Data/RetweetNew/163819",
         target: data[key[i]].parent_tweet
       };
     });
-    console.log(links)
-
-    function find_parent_tweet_index(i) {
-      return data[key[i]].parent_tweet;
-      //console.log(data[key[i]].parent_tweet)
-      //let parent = data[key[i]].parent_tweet;
-      //for (let k = 0; k < key.length; k++) {
-      //  if (parent == data[key[k]].tweet)
-      //    return k;
-      //}
-    }
+    //console.log(links)
 
     var svg = d3.select('svg')
     var color = d3.scaleOrdinal(d3.schemeCategory20);
@@ -57,11 +54,11 @@ d3.json("./Twitter_Data/RetweetNew/163819",
       .data(nodes)
       .enter().append("circle")
       .attr("r", 2)
-      .attr("fill", function (d) { return color(d.group); })
+      .attr("fill",'black')
       .call(d3.drag()
-        .on("start", dragstarted)
-        .on("drag", dragged)
-        .on("end", dragended));
+      .on("start", dragstarted)
+      .on("drag", dragged)
+      .on("end", dragended));
 
     var simulation = d3.forceSimulation()
       .force("x", d3.forceX())
