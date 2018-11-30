@@ -2,7 +2,8 @@ d3.select('body').append('svg').attr('width', 2000).attr('height', 2000)
 
 let file_list = [];
 //Read File list to array
-d3.csv("tweet_list", function (data) {
+d3.csv("tweet_list.json", function (data) {
+console.log(data)
   file_list.push(data.number);
 });
 d3.json("./Twitter_Data/Metadata/131010.json",function (data){
@@ -16,7 +17,7 @@ d3.json("./Twitter_Data/Metadata/131010.json",function (data){
 
 let tweet_data = [];
 let key = [];
-d3.json("./Twitter_Data/RetweetNew/131010",
+d3.json("./Twitter_Data/RetweetNew/131010.json",
 
   function draw_force_directed_graph(data) {
 
