@@ -1,6 +1,10 @@
 let width = 1200;
 let height = 900;
 let circle_radius = 2;
+let tweet_data = [];
+let key = [];
+let max_depth = 0;
+
 d3.select('body').append('svg').attr('width', width).attr('height', height)
 
 let file_list = [];
@@ -9,6 +13,7 @@ d3.csv("tweet_list.json", function (data) {
   console.log(data)
   file_list.push(data.number);
 });
+
 d3.json("./Twitter_Data/Metadata/131010.json", function (data) {
   for (let k = 0; k < data.length; k++) {
     if (data[k].id == 971857989211770880)
@@ -18,8 +23,6 @@ d3.json("./Twitter_Data/Metadata/131010.json", function (data) {
 })
 
 
-let tweet_data = [];
-let key = [];
 d3.json("./Twitter_Data/RetweetNew/28000.json").then(draw_force_directed_graph)
 
 function draw_force_directed_graph(data) {
@@ -29,6 +32,8 @@ function draw_force_directed_graph(data) {
   console.log(data)
 
   let nodes = d3.range(key.length).map(function (i) {
+    if(max_depth < data[key[i]].depth)
+      max_depth = +data[key[i]].depth;
     return {
       id: key[i],
       depth: data[key[i]].depth,
@@ -61,7 +66,7 @@ function draw_force_directed_graph(data) {
     .selectAll("line")
     .data(links)
     .enter()
-    //.filter(function(d){return d.child > 0})
+    //.filter(function(d){return d.depth <=1 })
     .append("line")
     .attr("stroke-width", 1);
 
@@ -70,10 +75,19 @@ function draw_force_directed_graph(data) {
     .selectAll("circle")
     .data(nodes)
     .enter()
-    //.filter(function(d){return d.depth >2 || d.depth ==0;})
+    //.filter(function(d){return d.depth <=2})
     .append("circle")
-    .attr("r", circle_radius)
-    .attr("fill", 'black')
+    .attr("r", function(d){
+      if(d.depth == 1)
+        return circle_radius+3;
+      else 
+        return circle_radius;
+    })
+    .attr("fill",  function (d){ 
+      if(d.depth == 1)
+        return 'red';
+      else
+        return 'black'; })
     .call(d3.drag()
       .on("start", dragstarted)
       .on("drag", dragged)
@@ -84,7 +98,7 @@ function draw_force_directed_graph(data) {
     .force("y", d3.forceY())
     .force("charge", d3.forceManyBody().strength(-10))
     .force("center", d3.forceCenter(width / 2, height / 2))
-    //.force("collision", d3.forceCollide().radius(circle_radius+1))
+    //.force("collision", d3.forceCollide().radius(nodes.depth))
     //.force("box_force", box_force)
     .nodes(nodes)
     .force("link", d3.forceLink(links).distance(10).strength(1).id(function (d) { return d.id; }))
