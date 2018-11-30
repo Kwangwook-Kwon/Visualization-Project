@@ -1,4 +1,7 @@
-d3.select('body').append('svg').attr('width', 2000).attr('height', 2000)
+var width = 1200;
+var height = 900;
+var circle_radius = 2;
+d3.select('body').append('svg').attr('width', width).attr('height', height)
 
 let file_list = [];
 //Read File list to array
@@ -17,7 +20,7 @@ d3.json("./Twitter_Data/Metadata/131010.json",function (data){
 
 let tweet_data = [];
 let key = [];
-d3.json("./Twitter_Data/RetweetNew/131010.json",
+d3.json("./Twitter_Data/RetweetNew/148595.json",
 
   function draw_force_directed_graph(data) {
 
@@ -54,7 +57,7 @@ d3.json("./Twitter_Data/RetweetNew/131010.json",
       .selectAll("circle")
       .data(nodes)
       .enter().append("circle")
-      .attr("r", 2)
+      .attr("r", circle_radius)
       .attr("fill",'black')
       .call(d3.drag()
       .on("start", dragstarted)
@@ -64,21 +67,30 @@ d3.json("./Twitter_Data/RetweetNew/131010.json",
     var simulation = d3.forceSimulation()
       .force("x", d3.forceX())
       .force("y", d3.forceY())
-      .force("charge", d3.forceManyBody().strength(-15))
-      .force("center", d3.forceCenter(600, 600))
+      .force("charge", d3.forceManyBody().strength(-10))
+      .force("center", d3.forceCenter(width /2 , height /2))
+      .force("collision",d3.forceCollide().radius(circle_radius))
+      .force("box_force", box_force)
       .nodes(nodes)
       .on("tick", ticked)
       .force("link", d3.forceLink(links).distance(10).strength(1).id(function (d) { return d.id; }))
 
     function ticked() {
       link
-        .attr("x1", function (d) { return d.source.x; })
-        .attr("y1", function (d) { return d.source.y; })
-        .attr("x2", function (d) { return d.target.x; })
-        .attr("y2", function (d) { return d.target.y; });
+        .attr("x1", function (d) { return Math.max(0,Math.min(d.source.x, width - circle_radius)); })
+        .attr("y1", function (d) { return Math.max(0,Math.min(d.source.y, height - circle_radius)); })
+        .attr("x2", function (d) { return Math.max(0,Math.min(d.target.x, width - circle_radius)); })
+        .attr("y2", function (d) { return Math.max(0,Math.min(d.target.y, height - circle_radius)); });
       node
-        .attr("cx", function (d) { return d.x; })
-        .attr("cy", function (d) { return d.y; });
+        .attr("cx", function (d) { return Math.max(0,Math.min(d.x, width - circle_radius)); })
+        .attr("cy", function (d) { return Math.max(0,Math.min(d.y, height - circle_radius)); });
+    }
+    function box_force() { 
+      for (var i = 0, n = nodes.length; i < n; ++i) {
+        curr_node = nodes[i];
+        curr_node.x = Math.max(circle_radius, Math.min(width - circle_radius, curr_node.x));
+        curr_node.y = Math.max(circle_radius, Math.min(height - circle_radius, curr_node.y));
+      }
     }
 
     function dragstarted(d) {
