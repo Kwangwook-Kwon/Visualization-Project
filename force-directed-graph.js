@@ -166,7 +166,7 @@ function draw_force_directed_graph(data) {
     if(id == data[id].parent_tweet  )
      return;
     else{
-      d3.selectAll('#nodes').select('#ID'+data[id].parent_tweet).attr("r",10).attr('fill','blue')
+      d3.selectAll('#nodes').select('#ID'+data[id].parent_tweet).attr("r",5).attr('fill','blue')
       d3.selectAll('#links').select('#ID'+data[id].parent_tweet+'to'+id).attr("stroke", "red").attr("stroke-width", 5).attr("opacity",1.0)
       highlight_parent(data[id].parent_tweet)
     }
