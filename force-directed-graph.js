@@ -61,8 +61,10 @@ function draw_force_directed_graph(data) {
     .data(links)
     .enter().filter(function(d){return (d.child > 0 )||(d.depth>2) })
     .append("line")
-    .attr("id", d=> 'ID'+d.targe)
-    .attr("stroke-width", 1);
+    .attr("id", d=> 'ID'+d.source+'to'+d.target)
+    .attr("stroke-width", 1)
+    .attr("stroke", '#999')
+    .attr("opacity", 0.6)
 
   let node = svg.append("g")
     .attr("class", "nodes").attr("id","nodes")
@@ -153,6 +155,10 @@ function draw_force_directed_graph(data) {
         else
           return 'black';
       })
+
+      d3.selectAll('#links').selectAll('line').attr("stroke-width", 1)
+      .attr("stroke", '#999')
+      .attr("opacity", 0.6)
     })
   }
 
@@ -161,6 +167,7 @@ function draw_force_directed_graph(data) {
      return;
     else{
       d3.selectAll('#nodes').select('#ID'+data[id].parent_tweet).attr("r",10).attr('fill','blue')
+      d3.selectAll('#links').select('#ID'+data[id].parent_tweet+'to'+id).attr("stroke", "red").attr("stroke-width", 5).attr("opacity",1.0)
       highlight_parent(data[id].parent_tweet)
     }
   }
