@@ -1,6 +1,6 @@
 let width = 1200;
 let height = 900;
-let max_circle_radius  = 2;
+let circle_radius = 2;
 let tweet_data = [];
 let key = [];
 let max_depth = 0;
@@ -10,7 +10,7 @@ d3.select('body').append('svg').attr('width', width).attr('height', height)
 let file_list = [];
 //Read File list to array
 d3.csv("tweet_list.json", function (data) {
-  //console.log(data)
+  console.log(data)
   file_list.push(data.number);
 });
 
@@ -19,7 +19,7 @@ d3.json("./Twitter_Data/Metadata/131010.json", function (data) {
     if (data[k].id == 971857989211770880)
       console.log("True")
   }
-  //console.log(data)
+  console.log(data)
 })
 
 
@@ -29,7 +29,7 @@ function draw_force_directed_graph(data) {
 
   let key = Object.keys(data)
   //console.log(key)
-  //console.log(data)
+  console.log(data)
 
   let nodes = d3.range(key.length).map(function (i) {
     if(max_depth < data[key[i]].depth)
@@ -79,11 +79,9 @@ function draw_force_directed_graph(data) {
     .append("circle")
     .attr("r", function(d){
       if(d.depth == 1)
-        return max_circle_radius;
-      else if(d.child == 0 &&d.depth == 2)
-        return 1;
-      else
-        return max_circle_radius;
+        return circle_radius+3;
+      else 
+        return circle_radius;
     })
     .attr("fill",  function (d){ 
       if(d.depth == 1)
@@ -98,14 +96,9 @@ function draw_force_directed_graph(data) {
   let simulation = d3.forceSimulation()
     .force("x", d3.forceX())
     .force("y", d3.forceY())
-    .force("charge", d3.forceManyBody().strength(function(d){
-      if(d.child == 0 &&d.depth == 2)
-        return -1;
-      else
-        return -15;
-    }).distanceMax(1000).theta(1))
+    .force("charge", d3.forceManyBody().strength(-10))
     .force("center", d3.forceCenter(width / 2, height / 2))
-    //.force("collision", d3.forceCollide().radius(function(d){return d.r;})).iterations(2))
+    //.force("collision", d3.forceCollide().radius(nodes.depth))
     //.force("box_force", box_force)
     .nodes(nodes)
     .force("link", d3.forceLink(links).distance(10).strength(1).id(function (d) { return d.id; }))
@@ -113,8 +106,8 @@ function draw_force_directed_graph(data) {
 
   function ticked() {
     node
-      .attr("cx", function (d) { return d.x; })//= Math.max(max_circle_radius , Math.min(d.x, width - max_circle_radius )); })
-      .attr("cy", function (d) { return d.y; }) //= Math.max(max_circle_radius , Math.min(d.y, height - max_circle_radius )); });
+      .attr("cx", function (d) { return d.x; })//= Math.max(circle_radius, Math.min(d.x, width - circle_radius)); })
+      .attr("cy", function (d) { return d.y; }) //= Math.max(circle_radius, Math.min(d.y, height - circle_radius)); });
 
     link
       .attr("x1", function (d) { return d.source.x; })
@@ -125,8 +118,8 @@ function draw_force_directed_graph(data) {
   function box_force() {
     for (let i = 0, n = nodes.length; i < n; ++i) {
       curr_node = nodes[i];
-      curr_node.x = Math.max(max_circle_radius , Math.min(width - max_circle_radius , curr_node.x));
-      curr_node.y = Math.max(max_circle_radius , Math.min(height - max_circle_radius , curr_node.y));
+      curr_node.x = Math.max(circle_radius, Math.min(width - circle_radius, curr_node.x));
+      curr_node.y = Math.max(circle_radius, Math.min(height - circle_radius, curr_node.y));
     }
   }
 
