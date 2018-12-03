@@ -39,10 +39,11 @@ function draw_force_directed_graph(data) {
 
   let links = d3.range(key.length).map(function (i) {
     return {
+      key: i,
       source: data[key[i]].parent_tweet,
       target: key[i],
-      depth: data[data[key[i]].parent_tweet].depth,
-      child: data[data[key[i]].parent_tweet].child
+      depth: data[key[i]].depth,
+      child: data[key[i]].child
     };
   });
 
@@ -58,18 +59,18 @@ function draw_force_directed_graph(data) {
     .attr("class", "links").attr('id',"links")
     .selectAll("line")
     .data(links)
-    .enter()    //.filter(function(d){return d.depth <=1 })
+    .enter().filter(function(d){return (d.child > 0 )||(d.depth>2) })
     .append("line")
-    .attr("id", d => d.target)
+    .attr("id", d=> 'ID'+d.targe)
     .attr("stroke-width", 1);
 
   let node = svg.append("g")
     .attr("class", "nodes").attr("id","nodes")
     .selectAll("circle")
     .data(nodes)
-    .enter()
+    .enter().filter(function(d){return (d.child > 0 )||(d.depth>2)})
     .append("circle")
-    .attr("id", d => d.id)
+    .attr("id", d =>'ID'+d.id)
     .attr("r", function (d) {
       if (d.depth == 1)
         return max_circle_radius;
@@ -89,16 +90,16 @@ function draw_force_directed_graph(data) {
       .on("drag", dragged)
       .on("end", dragended))
 
-  d3.forceSimulation()
+  let simulation = d3.forceSimulation()
     .nodes(nodes)
     .force("x", d3.forceX())
     .force("y", d3.forceY())
     .force("charge", d3.forceManyBody().strength(function (d) {
-      if (d.child == 0 && d.depth == 2)
-        return -1;
+      if (d.child == 0 && d.depth <= 2)
+        return 0;
       else
         return -15;
-    }).distanceMax(1000).theta(1))
+    }))
     .force("center", d3.forceCenter(width / 2, height / 2))
     .force("link", d3.forceLink(links).distance(10).strength(1).id(function (d) { return d.id; }))
     .on("tick", ticked)
@@ -115,44 +116,52 @@ function draw_force_directed_graph(data) {
       .attr("x2", function (d) { return d.target.x; })
       .attr("y2", function (d) { return d.target.y; });
   }
-}
+  function dragstarted(d) {
+    if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+    d.fx = d.x;
+    d.fy = d.y;
+  }
+  
+  function dragged(d) {
+    d.fx = d3.event.x;
+    d.fy = d3.event.y;
+  }
+  
+  function dragended(d) {
+    if (!d3.event.active) simulation.alphaTarget(0.1)
+    d.fx = null;
+    d.fy = null;
+  }
 
-function dragstarted(d) {
-  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-  d.fx = d.x;
-  d.fy = d.y;
-}
+  function events() {
 
-function dragged(d) {
-  d.fx = d3.event.x;
-  d.fy = d3.event.y;
-}
-
-function dragended(d) {
-  if (!d3.event.active) simulation.alphaTarget(0);
-  d.fx = null;
-  d.fy = null;
-}
-
-function events() {
-  console.log(this)
-
-  d3.selectAll('#nodes').selectAll('circle').on('mouseover', function () {
-    d3.select(this).attr("r",10).attr('fill','blue')
-  })
-  .on('mouseleave', function () {
-    d3.select(this).attr("r", function (d) {
-      if (d.depth == 1)
-        return max_circle_radius;
-      else if (d.child == 0 && d.depth == 2)
-        return 1;
-      else
-        return max_circle_radius;
-    }).attr("fill", function (d) {
-      if (d.depth == 1)
-        return 'red';
-      else
-        return 'black';
+    d3.selectAll('#nodes').selectAll('circle').on('mouseover', function () {
+      d3.select(this).attr("r",10).attr('fill','blue')
+      highlight_parent(this.id.slice(2));
     })
-  })
+    .on('mouseleave', function () {
+      d3.selectAll('#nodes').selectAll('circle').attr("r", function (d) {
+        if (d.depth == 1)
+          return max_circle_radius;
+        else if (d.child == 0 && d.depth == 2)
+          return 1;
+        else
+          return max_circle_radius;
+      }).attr("fill", function (d) {
+        if (d.depth == 1)
+          return 'red';
+        else
+          return 'black';
+      })
+    })
+  }
+
+  function highlight_parent(id){
+    if(id == data[id].parent_tweet  )
+     return;
+    else{
+      d3.selectAll('#nodes').select('#ID'+data[id].parent_tweet).attr("r",10).attr('fill','blue')
+      highlight_parent(data[id].parent_tweet)
+    }
+  }
 }
