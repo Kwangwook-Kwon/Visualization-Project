@@ -125,33 +125,51 @@ function draw_force_directed_graph(data) {
     .attr('y', height / 2)
     .text("Simulating. One moment please…");
 
-  svg.append("g").attr("id", "loading").append("text").attr("id", "progress")
+  d3.select("#loading").append("rect").attr("id", "bar")
+    .attr('x', width / 2 - 200)
+    .attr('y', (height / 2) + 30)
+    .attr("height", 40)
+    .attr("width", 0)
+
+  d3.select("#loading").append("rect")
+    .attr('x', width / 2 - 200)
+    .attr('y', (height / 2) + 30)
+    .attr("height", 40)
+    .attr("width", 400)
+    .style("fill", "none")
+    .style("stroke-width", 1)
+    .style("stroke", 'black')
+
+  d3.select("#loading").append("text").attr("id", "progress")
     .attr("dy", "0.35em")
     .attr("text-anchor", "middle")
     .attr("font-family", "sans-serif")
     .attr("font-size", 40)
     .attr('x', width / 2)
     .attr('y', (height / 2) + 50)
+    //.style("fill","yellow")
     .text("0 %");
 
-  function ticked() {
-    if((100 - simulation.alpha() * 100) >= 98){
-    events();
-    node
-      .attr("cx", function (d) { return d.x; })//= Math.max(max_circle_radius , Math.min(d.x, width - max_circle_radius )); })
-      .attr("cy", function (d) { return d.y; })
 
-    link
-      .attr("x1", function (d) { return d.source.x; })
-      .attr("y1", function (d) { return d.source.y; })
-      .attr("x2", function (d) { return d.target.x; })
-      .attr("y2", function (d) { return d.target.y; })
+  function ticked() {
+    if ((100 - simulation.alpha() * 100) >= 98) {
+      events();
+      node
+        .attr("cx", function (d) { return d.x; })//= Math.max(max_circle_radius , Math.min(d.x, width - max_circle_radius )); })
+        .attr("cy", function (d) { return d.y; })
+
+      link
+        .attr("x1", function (d) { return d.source.x; })
+        .attr("y1", function (d) { return d.source.y; })
+        .attr("x2", function (d) { return d.target.x; })
+        .attr("y2", function (d) { return d.target.y; })
     }
 
-    d3.select("#progress").transition().delay(0).text(Math.ceil(100 - simulation.alpha() * 100) + "%").transition().delay(0)
+    d3.select("#progress").transition().delay(0).text(Math.ceil(100 - simulation.alpha() * 100) + "%")
+    d3.select("#bar").transition().delay(0).attr("width", Math.ceil(100 - simulation.alpha() * 100) * 4).style("fill", d3.interpolateCool(1 - simulation.alpha()))
     if (Math.ceil(100 - simulation.alpha() * 100) >= 99) {
       d3.selectAll("#loading").remove();
-      d3.select("#border").style("fill",'none')
+      d3.select("#border").style("fill", 'none')
     }
   }
 
