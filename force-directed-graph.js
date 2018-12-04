@@ -248,9 +248,9 @@ function update_tree(data){
       .on("drag", dragged)
       .on("end", dragended))
 
-  //svg.select("#border")
-  //  .transition()
-  //  .style("fill", "none")
+  svg.select("#border")
+    .transition()
+    .style("fill", "none")
 
   svg.append("g").attr("id", "loading").append("text")
     .attr("dy", "0.35em")
