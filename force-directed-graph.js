@@ -14,7 +14,8 @@ svg.append("rect")
   .style("stroke", 'black')
   .style("fill", "none")
   .style("stroke-width", 1);
-  svg.append("g").attr("id","Loading").append("text")//.attr("id", "loading")
+
+svg.append("g").attr("id", "loading").append("text")
   .attr("dy", "0.35em")
   .attr("text-anchor", "middle")
   .attr("font-family", "sans-serif")
@@ -22,6 +23,15 @@ svg.append("rect")
   .attr('x', width / 2)
   .attr('y', height / 2)
   .text("Simulating. One moment please…");
+
+  svg.append("g").attr("id", "loading").append("text").attr("id","progress")
+  .attr("dy", "0.35em")
+  .attr("text-anchor", "middle")
+  .attr("font-family", "sans-serif")
+  .attr("font-size", 40)
+  .attr('x', width / 2)
+  .attr('y', (height / 2)+50)
+  .text("0 %");
 
 let file_list = [];
 d3.csv("tweet_list.json", function (data) {
@@ -87,7 +97,7 @@ function draw_force_directed_graph(data) {
 
   for (let i = 0, n = Math.ceil(Math.log(simulation.alphaMin()) / Math.log(1 - simulation.alphaDecay())); i < n; ++i) {
     simulation.tick();
-    //progress()
+    progress()
   }
   simulation.on("tick", ticked).tick()
   d3.selectAll("#loading").remove();
@@ -139,7 +149,8 @@ function draw_force_directed_graph(data) {
       .attr("x1", function (d) { return d.source.x; })
       .attr("y1", function (d) { return d.source.y; })
       .attr("x2", function (d) { return d.target.x; })
-      .attr("y2", function (d) { return d.target.y; });
+      .attr("y2", function (d) { return d.target.y; })
+      //d3.select("#progress").transition().delay(0).text("1234").transition().delay(0)
   }
 
   function dragstarted(d) {
@@ -220,15 +231,8 @@ function draw_force_directed_graph(data) {
     });
   };
 
-  function progress(){
-    d3.select("#Loading").append("text")//.attr("id", "loading")
-  .attr("dy", "0.35em")
-  .attr("text-anchor", "middle")
-  .attr("font-family", "sans-serif")
-  .attr("font-size", 40)
-  .attr('x', width / 2)
-  .attr('y', (height / 2)+100)
-  .text("111111111111111111111111111111111111111")
-  return;
+  function progress() {
+    d3.select("#progress").transition().delay(0).text("1234").transition().delay(0);
+    return;
   }
 }
