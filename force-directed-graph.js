@@ -1,11 +1,19 @@
-let width = 1200;
-let height = 900;
+let width = 1000;
+let height = 800;
 let max_circle_radius = 2;
 let tweet_data = [];
 let key = [];
 let max_depth = 0;
 
-d3.select('body').append('svg').attr('width', width).attr('height', height).attr("id", "Tree")
+let svg = d3.select('body').append('svg').attr('width', width).attr('height', height).attr("id", "Tree").attr("border",1).attr("stroke-width","20")
+svg.append("rect")
+.attr("x", 0)
+.attr("y", 0)
+.attr("height", height)
+.attr("width", width)
+.style("stroke", 'black')
+.style("fill", "none")
+.style("stroke-width", 1);
 
 let file_list = [];
 d3.csv("tweet_list.json", function (data) {
@@ -33,7 +41,8 @@ function draw_force_directed_graph(data) {
       id: key[i],
       depth: data[key[i]].depth,
       child: data[key[i]].child,
-      parent: data[key[i]].parent_tweet
+      parent: data[key[i]].parent_tweet,
+      bot: data[key[i]].bot
     };
   });
 
@@ -43,7 +52,8 @@ function draw_force_directed_graph(data) {
       source: data[key[i]].parent_tweet,
       target: key[i],
       depth: data[key[i]].depth,
-      child: data[key[i]].child
+      child: data[key[i]].child,
+      bot: data[key[i]].bot
     };
   });
 
@@ -56,23 +66,23 @@ function draw_force_directed_graph(data) {
   }
 
   let link = svg.append("g")
-    .attr("class", "links").attr('id',"links")
+    .attr("class", "links").attr('id', "links")
     .selectAll("line")
     .data(links)
-    .enter().filter(function(d){return (d.child > 0 )||(d.depth>2) })
+    .enter().filter(function (d) { return d.target != d.source })
     .append("line")
-    .attr("id", d=> 'ID'+d.source+'to'+d.target)
+    .attr("id", d => 'ID' + d.source + 'to' + d.target)
     .attr("stroke-width", 1)
     .attr("stroke", '#999')
     .attr("opacity", 0.6)
 
   let node = svg.append("g")
-    .attr("class", "nodes").attr("id","nodes")
+    .attr("class", "nodes").attr("id", "nodes")
     .selectAll("circle")
     .data(nodes)
-    .enter().filter(function(d){return (d.child > 0 )||(d.depth>2)})
+    .enter()//.filter(function(d){return (d.child > 0 )||(d.depth>2)})
     .append("circle")
-    .attr("id", d =>'ID'+d.id)
+    .attr("id", d => 'ID' + d.id)
     .attr("r", function (d) {
       if (d.depth == 1)
         return max_circle_radius;
@@ -82,10 +92,10 @@ function draw_force_directed_graph(data) {
         return max_circle_radius;
     })
     .attr("fill", function (d) {
-      if (d.depth == 1)
+      if (d.bot == 1)
         return 'red';
       else
-        return 'black';
+        return 'blue';
     })
     .call(d3.drag()
       .on("start", dragstarted)
@@ -98,7 +108,7 @@ function draw_force_directed_graph(data) {
     .force("y", d3.forceY())
     .force("charge", d3.forceManyBody().strength(function (d) {
       if (d.child == 0 && d.depth <= 2)
-        return 0;
+        return -1;
       else
         return -15;
     }))
@@ -123,12 +133,12 @@ function draw_force_directed_graph(data) {
     d.fx = d.x;
     d.fy = d.y;
   }
-  
+
   function dragged(d) {
     d.fx = d3.event.x;
     d.fy = d3.event.y;
   }
-  
+
   function dragended(d) {
     if (!d3.event.active) simulation.alphaTarget(0.1)
     d.fx = null;
@@ -138,36 +148,41 @@ function draw_force_directed_graph(data) {
   function events() {
 
     d3.selectAll('#nodes').selectAll('circle').on('mouseover', function () {
-      d3.select(this).attr("r",10).attr('fill','blue')
+      d3.select(this).attr("r", 10).attr('fill', 'blue')
       highlight_parent(this.id.slice(2));
     })
-    .on('mouseleave', function () {
-      d3.selectAll('#nodes').selectAll('circle').attr("r", function (d) {
-        if (d.depth == 1)
-          return max_circle_radius;
-        else if (d.child == 0 && d.depth == 2)
-          return 1;
-        else
-          return max_circle_radius;
-      }).attr("fill", function (d) {
-        if (d.depth == 1)
-          return 'red';
-        else
-          return 'black';
-      })
+      .on('mouseleave', function () {
+        d3.selectAll('#nodes').selectAll('circle').attr("r", function (d) {
+          if (d.depth == 1)
+            return max_circle_radius;
+          else if (d.child == 0 && d.depth == 2)
+            return 1;
+          else
+            return max_circle_radius;
+        }).attr("fill", function (d) {
+          if (d.bot == 1)
+            return 'red';
+          else
+            return 'blue';
+        })
 
-      d3.selectAll('#links').selectAll('line').attr("stroke-width", 1)
-      .attr("stroke", '#999')
-      .attr("opacity", 0.6)
-    })
+        d3.selectAll('#links').selectAll('line').attr("stroke-width", 1)
+          .attr("stroke", '#999')
+          .attr("opacity", 0.6)
+      })
   }
 
-  function highlight_parent(id){
-    if(id == data[id].parent_tweet  )
-     return;
-    else{
-      d3.selectAll('#nodes').select('#ID'+data[id].parent_tweet).attr("r",5).attr('fill','blue')
-      d3.selectAll('#links').select('#ID'+data[id].parent_tweet+'to'+id).attr("stroke", "red").attr("stroke-width", 5).attr("opacity",1.0)
+  function highlight_parent(id) {
+    if (id == data[id].parent_tweet)
+      return;
+    else {
+      d3.selectAll('#nodes').select('#ID' + data[id].parent_tweet).attr("r", 6)
+      d3.selectAll('#links').select('#ID' + data[id].parent_tweet + 'to' + id).attr("stroke", function (d) {
+        if (d.bot == 1)
+          return 'red';
+        else
+          return 'blue';
+      }).attr("stroke-width", 5).attr("opacity", 1.0)
       highlight_parent(data[id].parent_tweet)
     }
   }
