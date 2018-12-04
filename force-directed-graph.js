@@ -5,33 +5,36 @@ let tweet_data = [];
 let key = [];
 let max_depth = 0;
 
-let svg = d3.select('body').append('svg').attr('width', width).attr('height', height).attr("id", "Tree").attr("border",1).attr("stroke-width","20")
+let svg = d3.select('body').append('svg').attr('width', width).attr('height', height).attr("id", "Tree").attr("border", 1).attr("stroke-width", "20")
 svg.append("rect")
-.attr("x", 0)
-.attr("y", 0)
-.attr("height", height)
-.attr("width", width)
-.style("stroke", 'black')
-.style("fill", "none")
-.style("stroke-width", 1);
+  .attr("x", 0)
+  .attr("y", 0)
+  .attr("height", height)
+  .attr("width", width)
+  .style("stroke", 'black')
+  .style("fill", "none")
+  .style("stroke-width", 1);
+  svg.append("g").attr("id","Loading").append("text")//.attr("id", "loading")
+  .attr("dy", "0.35em")
+  .attr("text-anchor", "middle")
+  .attr("font-family", "sans-serif")
+  .attr("font-size", 40)
+  .attr('x', width / 2)
+  .attr('y', height / 2)
+  .text("Simulating. One moment please…");
 
 let file_list = [];
 d3.csv("tweet_list.json", function (data) {
   file_list.push(data.number);
 });
 
-d3.json("./Twitter_Data/Metadata/131010.json", function (data) {
-  for (let k = 0; k < data.length; k++) {
-    if (data[k].id == 971857989211770880)
-      console.log("True")
-  }
-})
 
 
 d3.json("./Twitter_Data/RetweetNew/28000.json").then(draw_force_directed_graph)
 
 function draw_force_directed_graph(data) {
 
+  let svg = d3.select('#Tree')
   let key = Object.keys(data)
 
   let nodes = d3.range(key.length).map(function (i) {
@@ -49,15 +52,17 @@ function draw_force_directed_graph(data) {
   let links = d3.range(key.length).map(function (i) {
     return {
       key: i,
-      source: data[key[i]].parent_tweet,
-      target: key[i],
+      source: key[i],
+      target: data[key[i]].parent_tweet,
       depth: data[key[i]].depth,
       child: data[key[i]].child,
       bot: data[key[i]].bot
     };
+  }).filter(function (d) {
+    return d.source != d.target;
   });
+  console.log(links)
 
-  let svg = d3.select('svg')
   let zoom_handler = d3.zoom().on("zoom", zoom_actions);
   zoom_handler(svg);
 
@@ -65,13 +70,35 @@ function draw_force_directed_graph(data) {
     svg.selectAll('g').attr("transform", d3.event.transform)
   }
 
+
+  let simulation = d3.forceSimulation()
+    .nodes(nodes)
+    .force("x", d3.forceX())
+    .force("y", d3.forceY())
+    .force("charge", d3.forceManyBody().strength(function (d) {
+      if (d.child == 0 && d.depth <= 2)
+        return -1;
+      else
+        return -15;
+    }))
+    .force("center", d3.forceCenter(width / 2, height / 2))
+    .force("link", d3.forceLink(links).distance(10).strength(1).id(function (d) { return d.id; }))
+    //.on("tick", ticked)
+
+  for (let i = 0, n = Math.ceil(Math.log(simulation.alphaMin()) / Math.log(1 - simulation.alphaDecay())); i < n; ++i) {
+    simulation.tick();
+    //progress()
+  }
+  simulation.on("tick", ticked).tick()
+  d3.selectAll("#loading").remove();
+
   let link = svg.append("g")
     .attr("class", "links").attr('id', "links")
     .selectAll("line")
     .data(links)
-    .enter().filter(function (d) { return d.target != d.source })
+    .enter()
     .append("line")
-    .attr("id", d => 'ID' + d.source + 'to' + d.target)
+    .attr("id", d => 'ID' + d.source.id + 'to' + d.target.id)
     .attr("stroke-width", 1)
     .attr("stroke", '#999')
     .attr("opacity", 0.6)
@@ -102,20 +129,6 @@ function draw_force_directed_graph(data) {
       .on("drag", dragged)
       .on("end", dragended))
 
-  let simulation = d3.forceSimulation()
-    .nodes(nodes)
-    .force("x", d3.forceX())
-    .force("y", d3.forceY())
-    .force("charge", d3.forceManyBody().strength(function (d) {
-      if (d.child == 0 && d.depth <= 2)
-        return -1;
-      else
-        return -15;
-    }))
-    .force("center", d3.forceCenter(width / 2, height / 2))
-    .force("link", d3.forceLink(links).distance(10).strength(1).id(function (d) { return d.id; }))
-    .on("tick", ticked)
-
   function ticked() {
     events();
     node
@@ -128,6 +141,7 @@ function draw_force_directed_graph(data) {
       .attr("x2", function (d) { return d.target.x; })
       .attr("y2", function (d) { return d.target.y; });
   }
+
   function dragstarted(d) {
     if (!d3.event.active) simulation.alphaTarget(0.3).restart();
     d.fx = d.x;
@@ -148,9 +162,10 @@ function draw_force_directed_graph(data) {
   function events() {
 
     d3.selectAll('#nodes').selectAll('circle').on('mouseover', function () {
-      d3.select(this).attr("r", 10).attr('fill', 'blue')
+      d3.select(this).attr("r", 10)
       highlight_parent(this.id.slice(2));
     })
+
       .on('mouseleave', function () {
         d3.selectAll('#nodes').selectAll('circle').attr("r", function (d) {
           if (d.depth == 1)
@@ -176,8 +191,11 @@ function draw_force_directed_graph(data) {
     if (id == data[id].parent_tweet)
       return;
     else {
+      console.log('#ID' + data[id].parent_tweet + 'to' + id)
       d3.selectAll('#nodes').select('#ID' + data[id].parent_tweet).attr("r", 6)
-      d3.selectAll('#links').select('#ID' + data[id].parent_tweet + 'to' + id).attr("stroke", function (d) {
+      d3.selectAll('#nodes').select('#ID' + data[id].parent_tweet).moveToFront()
+      d3.selectAll('#links').select('#ID' + id + 'to' + data[id].parent_tweet).moveToFront();
+      d3.selectAll('#links').select('#ID' + id + 'to' + data[id].parent_tweet).attr("stroke", function (d) {
         if (d.bot == 1)
           return 'red';
         else
@@ -185,5 +203,32 @@ function draw_force_directed_graph(data) {
       }).attr("stroke-width", 5).attr("opacity", 1.0)
       highlight_parent(data[id].parent_tweet)
     }
+  }
+
+  d3.selection.prototype.moveToFront = function () {
+    return this.each(function () {
+      this.parentNode.appendChild(this);
+    });
+  };
+
+  d3.selection.prototype.moveToBack = function () {
+    return this.each(function () {
+      var firstChild = this.parentNode.firstChild;
+      if (firstChild) {
+        this.parentNode.insertBefore(this, firstChild);
+      }
+    });
+  };
+
+  function progress(){
+    d3.select("#Loading").append("text")//.attr("id", "loading")
+  .attr("dy", "0.35em")
+  .attr("text-anchor", "middle")
+  .attr("font-family", "sans-serif")
+  .attr("font-size", 40)
+  .attr('x', width / 2)
+  .attr('y', (height / 2)+100)
+  .text("111111111111111111111111111111111111111")
+  return;
   }
 }
