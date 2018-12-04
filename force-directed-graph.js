@@ -6,32 +6,6 @@ let key = [];
 let max_depth = 0;
 
 let svg = d3.select('body').append('svg').attr('width', width).attr('height', height).attr("id", "Tree").attr("border", 1).attr("stroke-width", "20")
-svg.append("rect")
-  .attr("x", 0)
-  .attr("y", 0)
-  .attr("height", height)
-  .attr("width", width)
-  .style("stroke", 'black')
-  .style("fill", "none")
-  .style("stroke-width", 1);
-
-svg.append("g").attr("id", "loading").append("text")
-  .attr("dy", "0.35em")
-  .attr("text-anchor", "middle")
-  .attr("font-family", "sans-serif")
-  .attr("font-size", 40)
-  .attr('x', width / 2)
-  .attr('y', height / 2)
-  .text("Simulating. One moment please…");
-
-  svg.append("g").attr("id", "loading").append("text").attr("id","progress")
-  .attr("dy", "0.35em")
-  .attr("text-anchor", "middle")
-  .attr("font-family", "sans-serif")
-  .attr("font-size", 40)
-  .attr('x', width / 2)
-  .attr('y', (height / 2)+50)
-  .text("0 %");
 
 let file_list = [];
 d3.csv("tweet_list.json", function (data) {
@@ -93,14 +67,7 @@ function draw_force_directed_graph(data) {
     }))
     .force("center", d3.forceCenter(width / 2, height / 2))
     .force("link", d3.forceLink(links).distance(10).strength(1).id(function (d) { return d.id; }))
-    //.on("tick", ticked)
-
-  for (let i = 0, n = Math.ceil(Math.log(simulation.alphaMin()) / Math.log(1 - simulation.alphaDecay())); i < n; ++i) {
-    simulation.tick();
-    progress()
-  }
-  simulation.on("tick", ticked).tick()
-  d3.selectAll("#loading").remove();
+    .on("tick", ticked)
 
   let link = svg.append("g")
     .attr("class", "links").attr('id', "links")
@@ -139,7 +106,36 @@ function draw_force_directed_graph(data) {
       .on("drag", dragged)
       .on("end", dragended))
 
+  svg.append("rect").attr("id", "border")
+    .attr("x", 0)
+    .attr("y", 0)
+    .attr("height", height)
+    .attr("width", width)
+    .style("stroke", 'black')
+    .style("fill", "white")
+    .style("stroke-width", 1);
+
+
+  svg.append("g").attr("id", "loading").append("text")
+    .attr("dy", "0.35em")
+    .attr("text-anchor", "middle")
+    .attr("font-family", "sans-serif")
+    .attr("font-size", 40)
+    .attr('x', width / 2)
+    .attr('y', height / 2)
+    .text("Simulating. One moment please…");
+
+  svg.append("g").attr("id", "loading").append("text").attr("id", "progress")
+    .attr("dy", "0.35em")
+    .attr("text-anchor", "middle")
+    .attr("font-family", "sans-serif")
+    .attr("font-size", 40)
+    .attr('x', width / 2)
+    .attr('y', (height / 2) + 50)
+    .text("0 %");
+
   function ticked() {
+    if((100 - simulation.alpha() * 100) >= 98){
     events();
     node
       .attr("cx", function (d) { return d.x; })//= Math.max(max_circle_radius , Math.min(d.x, width - max_circle_radius )); })
@@ -150,7 +146,13 @@ function draw_force_directed_graph(data) {
       .attr("y1", function (d) { return d.source.y; })
       .attr("x2", function (d) { return d.target.x; })
       .attr("y2", function (d) { return d.target.y; })
-      //d3.select("#progress").transition().delay(0).text("1234").transition().delay(0)
+    }
+
+    d3.select("#progress").transition().delay(0).text(Math.ceil(100 - simulation.alpha() * 100) + "%").transition().delay(0)
+    if (Math.ceil(100 - simulation.alpha() * 100) >= 99) {
+      d3.selectAll("#loading").remove();
+      d3.select("#border").style("fill",'none')
+    }
   }
 
   function dragstarted(d) {
@@ -230,9 +232,4 @@ function draw_force_directed_graph(data) {
       }
     });
   };
-
-  function progress() {
-    d3.select("#progress").transition().delay(0).text("1234").transition().delay(0);
-    return;
-  }
 }
