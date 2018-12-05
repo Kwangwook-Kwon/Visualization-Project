@@ -92,7 +92,7 @@ function update_tree(data) {
   svg.select("#border")
     .transition()
     .style("fill", "none")
-    
+
   draw_nodes_links()
 }
 
@@ -268,7 +268,7 @@ function highlight_parent(id) {
         return 'red';
       else
         return 'blue';
-    }).attr("stroke-tree_svg_width", 5).attr("opacity", 1.0)
+    }).attr("stroke-width", 3).attr("opacity", 1.0)
     highlight_parent(input_data[id].parent_tweet)
   }
 }
