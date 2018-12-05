@@ -265,7 +265,7 @@ function update_tree(data){
     .attr('x', tree_svg_width / 2 - 200)
     .attr('y', (tree_svg_height / 2) + 30)
     .attr("height", 40)
-    .attr("tree_svg_width", 0)
+    .attr("width", 1)
 
   d3.select("#loading").append("rect")
     .attr('x', tree_svg_width / 2 - 200)
@@ -273,7 +273,7 @@ function update_tree(data){
     .attr("height", 40)
     .attr("width", 400)
     .style("fill", "none")
-    .style("stroke-tree_svg_width", 1)
+    .style("width", 1)
     .style("stroke", 'black')
 
   d3.select("#loading").append("text").attr("id", "progress")
@@ -308,9 +308,9 @@ function ticked() {
     zoom_handler(svg);
     loaded = 1
   }
-
-  d3.select("#progress").transition().delay(0).text(Math.ceil(100 - simulation.alpha() * 100) + "%")
-  d3.select("#bar").transition().delay(0).attr("width", Math.ceil(100 - simulation.alpha() * 100) * 4).style("fill", d3.interpolateCool(1 - simulation.alpha()))
+  let cur_alpha = simulation.alpha();
+  d3.select("#progress").transition().text(Math.ceil(100 - cur_alpha * 100) + "%")
+  d3.select("#bar").attr("width", Math.ceil(100 - cur_alpha * 100) * 4).style("fill", d3.interpolateCool(1 - cur_alpha))
   if (Math.ceil(100 - simulation.alpha() * 100) >= 99) {
     d3.selectAll("#loading").remove();
     d3.select("#border").style("fill", 'none')
