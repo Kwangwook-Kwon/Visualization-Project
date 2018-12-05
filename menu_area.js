@@ -4,7 +4,7 @@ function combobox(data) {
     let select = d3.select('body')
         .append('select')
         .attr('class', 'select')
-        .on('change', onchange)
+        .on('change', onchange_combobox)
 
     select
         .selectAll('option')
@@ -16,9 +16,9 @@ function combobox(data) {
                 return 'selected';
         })
     initial_draw_tree(28000)
-
-    function onchange() {
-        selectValue = d3.select('select').property('value')
-        select_update_tree(selectValue)
-    };
 }
+
+function onchange_combobox() {
+    let selectValue = d3.select('select').property('value')
+    select_update_tree(selectValue)
+};
