@@ -11,11 +11,37 @@
       border: 1px solid black;
       border-radius: 1px;
     }
+
+.arc text {
+  font: 10px sans-serif;
+  text-anchor: middle;
+}
+
+.arc path {
+  stroke: #fff;
+}
+
+.toolTip {
+    position: absolute;
+    display: none;
+    width: auto;
+    height: auto;
+    background: none repeat scroll 0 0 white;
+    border: 0 none;
+    border-radius: 8px 8px 8px 8px;
+    box-shadow: -3px 3px 15px #888888;
+    color: black;
+    font: 12px sans-serif;
+    padding: 5px;
+    text-align: center;
+}
+
 </style>
 <body>
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="menu_area.js"></script>
     <script src="force-directed-graph.js"></script>
-
-    <button type="button" onclick="location.href='pie.html' ">시간 기준 분석으로 이동</button>
+    <script src="pie_chart.js"></script>
+    <!-- <script src="pie_combo.js"></script> -->
+    <!-- <button type="button" onclick="location.href='pie.html' ">시간 기준 분석으로 이동</button> -->
 </body>

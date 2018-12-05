@@ -16,9 +16,13 @@ function combobox(data) {
                 return 'selected';
         })
     initial_draw_tree(28000)
+    initId(28000, true)
 }
 
 function onchange_combobox() {
     let selectValue = d3.select('select').property('value')
     select_update_tree(selectValue)
+    initId(selectValue, false);
 };
+
+
