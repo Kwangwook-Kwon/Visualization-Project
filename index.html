@@ -2,26 +2,26 @@
 <meta charset="utf-8">
 <title>D3 Force-Directed Graph</title>
 <style>
-    select {
-      height: 30px;
-      padding-left: 10px;
-      margin-right: 10px;
-      font-size: 15px;
-      color: black;
-      border: 1px solid black;
-      border-radius: 1px;
-    }
+  select {
+    height: 30px;
+    padding-left: 10px;
+    margin-right: 10px;
+    font-size: 15px;
+    color: black;
+    border: 1px solid black;
+    border-radius: 1px;
+  }
 
-.arc text {
-  font: 10px sans-serif;
-  text-anchor: middle;
-}
+  .arc text {
+    font: 10px sans-serif;
+    text-anchor: middle;
+  }
 
-.arc path {
-  stroke: #fff;
-}
+  .arc path {
+    stroke: #fff;
+  }
 
-.toolTip {
+  .toolTip {
     position: absolute;
     display: none;
     width: auto;
@@ -34,14 +34,40 @@
     font: 12px sans-serif;
     padding: 5px;
     text-align: center;
-}
+  }
 
+  .treeArea {
+    position: absolute;
+    width: 1000px;
+    height: 800px;
+    left: 10px;
+    top: 50px;
+  }
+
+  .menuArea {
+    position: absolute;
+    width: auto;
+    height: 40px;
+    left: 10px;
+    top: 10px;
+  }
+  .pieArea {
+    position: absolute;
+    width: 300px;
+    height: 800px;
+    left: 1010px;
+    top: 10px;
+  }
+
+
+  .pie
 </style>
+
 <body>
-    <script src="https://d3js.org/d3.v5.min.js"></script>
-    <script src="menu_area.js"></script>
-    <script src="force-directed-graph.js"></script>
-    <script src="pie_chart.js"></script>
-    <!-- <script src="pie_combo.js"></script> -->
-    <!-- <button type="button" onclick="location.href='pie.html' ">시간 기준 분석으로 이동</button> -->
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="menu_area.js"></script>
+  <script src="force-directed-graph.js"></script>
+  <script src="pie_chart.js"></script>
+  <!-- <script src="pie_combo.js"></script> -->
+  <!-- <button type="button" onclick="location.href='pie.html' ">시간 기준 분석으로 이동</button> -->
 </body>

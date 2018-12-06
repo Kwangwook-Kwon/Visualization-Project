@@ -35,9 +35,8 @@ var dataset = [{name:"00:00-06:00", total:cnt_00_06, percent: (cnt_00_06/key.len
     {name:"12:00-18:00", total:cnt_12_18, percent: (cnt_12_18/key.length) * 100},
     {name:"18:00-24:00", total:cnt_18_24, percent: (cnt_18_24/key.length) * 100}];
 
-var div = d3.select("body").append("div").attr("class", "toolTip");
 
-var width = 960,
+var width = 500,
   height = 500,
   radius = Math.min(width, height) / 2;
 
@@ -54,13 +53,14 @@ var pie = d3.pie()
   .endAngle(3.1*Math.PI)
   .value(function(d) { return d.total; });
 
-var svg = d3.select("body").append("svg")
+var svg = d3.select("body").append('div').attr('class', 'pieArea').append("svg")
   .attr("width", width)
   .attr("height", height)
   .attr("class", "piechart")
   .append("g")
   .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
+var div = d3.select("body").append("div").attr("class", "toolTip");
 
 var g = svg.selectAll(".arc")
     .data(pie(dataset))

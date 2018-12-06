@@ -1,7 +1,8 @@
+let menuView = d3.select('body').append('div').attr('class','menuArea')
 d3.csv("tweet_list.json").then(combobox)
 
 function combobox(data) {
-    let select = d3.select('body')
+    let select = menuView
         .append('select')
         .attr('class', 'select')
         .on('change', onchange_combobox)

@@ -5,7 +5,7 @@ let tweet_data = [];
 let key = [];
 let max_depth = 0;
 
-let svg = d3.select('body').append('svg').attr('width', tree_svg_width).attr('height', tree_svg_height).attr("id", "Tree")
+let svg = d3.select('body').append('div').attr('class','treeArea').append('svg').attr('width', tree_svg_width).attr('height', tree_svg_height).attr("id", "Tree")
 svg.append("rect").attr("id", "border")
   .attr("x", 0)
   .attr("y", 0)
