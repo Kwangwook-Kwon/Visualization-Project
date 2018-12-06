@@ -14,6 +14,10 @@ svg.append("rect").attr("id", "border")
   .style("stroke", 'black')
   .style("fill", "white")
   .style("stroke-width", 1);
+
+let tooltip = d3.select("body")
+    .append("div").attr("class","toolTip").attr("id","toolTip")
+
 let simulation = d3.forceSimulation()
 let node, nodes, link, links
 let zoom_handler
@@ -233,6 +237,14 @@ function events() {
   d3.selectAll('#nodes').selectAll('circle').on('mouseover', function () {
     d3.select(this).attr("r", 10)
     highlight_parent(this.id.slice(2));
+    tooltip.style("left", d3.event.pageX+10+"px");
+    tooltip.style("top", function(){ if(d3.event.pageY > tree_svg_height/2 )
+                                        return d3.event.pageY + 30 +"px";
+                                      else 
+                                        return d3.event.pageY - 80 +"px";
+    })
+    tooltip.style("display", "inline-block");
+    tooltip.html(input_data[this.id.slice(2)].time+"<br>"+input_data[this.id.slice(2)].text + "<br>"+input_data[this.id.slice(2)].screen_name );
   })
 
     .on('mouseleave', function () {
@@ -253,6 +265,7 @@ function events() {
       d3.selectAll('#links').selectAll('line').attr("stroke-tree_svg_width", 1)
         .attr("stroke", '#999')
         .attr("opacity", 0.6)
+        tooltip.style("display", "none");
     })
 }
 
