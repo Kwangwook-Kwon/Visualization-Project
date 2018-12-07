@@ -25,5 +25,3 @@ function onchange_combobox() {
     select_update_tree(selectValue)
     initId(selectValue, false);
 };
-
-

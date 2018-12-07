@@ -4,9 +4,15 @@ let max_circle_radius = 2;
 let tweet_data = [];
 let key = [];
 let max_depth = 0;
+let zoom_check;
 
-let svg = d3.select('body').append('div').attr('class','treeArea').append('svg').attr('width', tree_svg_width).attr('height', tree_svg_height).attr("id", "Tree")
-svg.append("rect").attr("id", "border")
+let tree_svg = d3.select('body').append('div').attr("id", "treearea").attr('class', 'treeArea').append('svg').attr('width', tree_svg_width).attr('height', tree_svg_height).attr("id", "Tree")
+d3.select("#treearea").append('input').attr('type', 'checkbox').attr('id', 'treeCheckbox').on("change", change_tree_mode).style('position', 'absolute').style('left', '10px').style('top', '7px')
+d3.select("#treearea").append('text').text('Zoom').style('position', 'absolute').style('left', '30px').style('top', '5px')
+
+
+
+tree_svg.append("rect").attr("id", "border")
   .attr("x", 0)
   .attr("y", 0)
   .attr("height", tree_svg_height)
@@ -15,8 +21,10 @@ svg.append("rect").attr("id", "border")
   .style("fill", "white")
   .style("stroke-width", 1);
 
+
+
 let tooltip = d3.select("body")
-    .append("div").attr("class","toolTip").attr("id","toolTip")
+  .append("div").attr("class", "toolTip").attr("id", "toolTip")
 
 let simulation = d3.forceSimulation()
 let node, nodes, link, links
@@ -60,6 +68,7 @@ function initialize_graph() {
     .on("tick", ticked)
 
   draw_nodes_links()
+
 }
 
 function update_tree(data) {
@@ -93,7 +102,7 @@ function update_tree(data) {
     .alpha(1).restart()
 
 
-  svg.select("#border")
+  tree_svg.select("#border")
     .transition()
     .style("fill", "none")
 
@@ -131,7 +140,7 @@ function prepare_data() {
 
 function draw_nodes_links() {
 
-  link = svg.append("g")
+  link = tree_svg.append("g")
     .attr("class", "links").attr('id', "links")
     .selectAll("line")
     .data(links)
@@ -142,7 +151,7 @@ function draw_nodes_links() {
     .attr("stroke", '#999')
     .attr("opacity", 0.6)
 
-  node = svg.append("g")
+  node = tree_svg.append("g")
     .attr("class", "nodes").attr("id", "nodes")
     .selectAll("circle")
     .data(nodes)
@@ -168,7 +177,7 @@ function draw_nodes_links() {
       .on("drag", dragged)
       .on("end", dragended))
 
-  svg.append("g").attr("id", "loading").append("text")
+  tree_svg.append("g").attr("id", "loading").append("text")
     .attr("dy", "0.35em")
     .attr("text-anchor", "middle")
     .attr("font-family", "sans-serif")
@@ -205,7 +214,11 @@ function draw_nodes_links() {
 }
 
 function zoom_actions() {
-  svg.selectAll('g').attr("transform", d3.event.transform)
+  if(zoom_check){
+    tree_svg.selectAll('g').attr("transform", d3.event.transform)
+  }else{
+    tree_svg.selectAll('g').attr("transform", null)
+  }
 }
 
 function ticked() {
@@ -219,16 +232,23 @@ function ticked() {
       .attr("y1", function (d) { return d.source.y; })
       .attr("x2", function (d) { return d.target.x; })
       .attr("y2", function (d) { return d.target.y; })
-    zoom_handler = d3.zoom().on("zoom", zoom_actions);
-    zoom_handler(svg);
-    loaded = 1
+      loaded = 1
   }
   let cur_alpha = simulation.alpha();
   d3.select("#progress").transition().text(Math.ceil(100 - cur_alpha * 100) + "%")
   d3.select("#bar").attr("width", Math.ceil(100 - cur_alpha * 100) * 4).style("fill", d3.interpolateCool(1 - cur_alpha))
   if (Math.ceil(100 - simulation.alpha() * 100) >= 99) {
     d3.selectAll("#loading").remove();
-    d3.select("#border").style("fill", 'none')
+    tree_svg.select("#border").style("fill", 'none')
+    tree_svg.style('cursor','wait')
+    if(zoom_check){
+      zoom_handler(tree_svg);
+      tree_svg.style('cursor','move')
+    }else{
+      tree_svg.style('cursor','Crosshair')
+    }
+  }else{
+    tree_svg.style('cursor','wait')
   }
 }
 
@@ -238,24 +258,25 @@ function events() {
     d3.select(this).attr("r", 10)
 
     let pie_id = get_pie_id(this.id.slice(2))
-    d3.select('body').select(pie_id).style("fill",function(d){return d3.color(pie_color(d.data.name)).darker(1);}).style("stroke","black")
+    d3.select('body').select(pie_id).style("fill", function (d) { return d3.color(pie_color(d.data.name)).darker(1); }).style("stroke", "black")
 
     highlight_parent(this.id.slice(2));
-    tooltip.style("left", d3.event.pageX+10+"px");
-    tooltip.style("top", function(){ if(d3.event.pageY > tree_svg_height/2 )
-                                        return d3.event.pageY + 30 +"px";
-                                      else 
-                                        return d3.event.pageY - 80 +"px";
+    tooltip.style("left", d3.event.pageX + 10 + "px");
+    tooltip.style("top", function () {
+      if (d3.event.pageY > tree_svg_height / 2)
+        return d3.event.pageY + 30 + "px";
+      else
+        return d3.event.pageY - 80 + "px";
     })
     tooltip.style("display", "inline-block");
-    tooltip.html(input_data[this.id.slice(2)].time+"<br>"+input_data[this.id.slice(2)].text + "<br>"+input_data[this.id.slice(2)].screen_name );
+    tooltip.html(input_data[this.id.slice(2)].time + "<br>" + input_data[this.id.slice(2)].text + "<br>" + input_data[this.id.slice(2)].screen_name);
     tooltip.moveToFront();
   })
 
     .on('mouseleave', function () {
       reset_nodes();
       let pie_id = get_pie_id(this.id.slice(2))
-      d3.select('body').select(pie_id).style("fill", function (d) { return pie_color(d.data.name); }).style("stroke","white")
+      d3.select('body').select(pie_id).style("fill", function (d) { return pie_color(d.data.name); }).style("stroke", "white")
 
       d3.selectAll('#links').selectAll('line').attr("stroke-width", 1)
         .attr("stroke", '#999')
@@ -313,7 +334,7 @@ function dragended(d) {
   d.fy = null;
 }
 
-function reset_nodes(){
+function reset_nodes() {
   d3.selectAll('#nodes').selectAll('circle').attr("r", function (d) {
     if (d.depth == 1)
       return max_circle_radius;
@@ -326,18 +347,31 @@ function reset_nodes(){
       return 'red';
     else
       return 'blue';
-  }).style("opacity",1)
+  }).style("opacity", 1)
 }
 
-function get_pie_id(id){
-    let time =  input_data[id].time.substring(11,13)
-    if (time >= 0 && time < 6) {
-      return "#PIE00"
-    } else if (time >= 6 && time < 12) {
-      return "#PIE06"
-    } else if (time >= 12 && time < 18) {
-      return "#PIE12"
-    } else if (time >= 18 && time < 24) {
-      return "#PIE18"
-    }
+function get_pie_id(id) {
+  let time = input_data[id].time.substring(11, 13)
+  if (time >= 0 && time < 6) {
+    return "#PIE00"
+  } else if (time >= 6 && time < 12) {
+    return "#PIE06"
+  } else if (time >= 12 && time < 18) {
+    return "#PIE12"
+  } else if (time >= 18 && time < 24) {
+    return "#PIE18"
+  }
+}
+
+
+function change_tree_mode() {
+  zoom_check = d3.select("#treeCheckbox").property("checked")
+  zoom_handler = d3.zoom().on("zoom", zoom_actions);
+  if(zoom_check){
+    zoom_handler = d3.zoom().on("zoom", zoom_actions);
+    zoom_handler(tree_svg);
+    tree_svg.style('cursor','move')
+  }else{
+    tree_svg.on('.zoom', null);
+  }
 }
