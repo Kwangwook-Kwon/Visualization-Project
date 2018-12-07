@@ -373,5 +373,6 @@ function change_tree_mode() {
     tree_svg.style('cursor','move')
   }else{
     tree_svg.on('.zoom', null);
+    tree_svg.style('cursor','crosshair')
   }
 }
