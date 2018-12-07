@@ -113,11 +113,13 @@ function draw_pie_chart(data) {
       })
       //console.log(d3.select('body').select("#nodes").select("#ID"+d))
     });
+    d3.select(this).style("fill",function(d){return d3.color(pie_color(d.data.name)).darker(1);}).style("stroke","black")
   });
 
   d3.selectAll("path").on("mouseout", function (d) {
     div.style("display", "none");
     reset_nodes();
+    d3.select(this).style("fill",function(d){return d3.color(pie_color(d.data.name));}).style("stroke","white")
   });
 
   function type(d) {
