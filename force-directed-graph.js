@@ -8,7 +8,7 @@ let zoom_check;
 
 let tree_svg = d3.select('body').append('div').attr("id", "treearea").attr('class', 'treeArea').append('svg').attr('width', tree_svg_width).attr('height', tree_svg_height).attr("id", "Tree")
 d3.select("#treearea").append('input').attr('type', 'checkbox').attr('id', 'treeCheckbox').on("change", change_tree_mode).style('position', 'absolute').style('left', '10px').style('top', '7px')
-d3.select("#treearea").append('text').text('Zoom').style('position', 'absolute').style('left', '30px').style('top', '5px')
+d3.select("#treearea").append('text').text('Zoom & Move').style('position', 'absolute').style('left', '30px').style('top', '5px').style('background','white')
 
 
 
@@ -61,10 +61,10 @@ function initialize_graph() {
       if (d.child == 0 && d.depth <= 2)
         return -1;
       else
-        return -15;
+        return -10;
     }))
     .force("center", d3.forceCenter(tree_svg_width / 2, tree_svg_height / 2))
-    .force("link", d3.forceLink(links).distance(10).strength(1).id(function (d) { return d.id; }))
+    .force("link", d3.forceLink(links).distance(20).strength(1).id(function (d) { return d.id; }))
     .on("tick", ticked)
 
   draw_nodes_links()
