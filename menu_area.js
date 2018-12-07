@@ -18,7 +18,6 @@ function combobox(data) {
         })
     initial_draw_tree(28000)
     initId(28000, true)
-    initial_draw_line(28000)
 }
 
 function onchange_combobox() {
