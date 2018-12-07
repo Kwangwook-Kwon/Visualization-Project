@@ -236,6 +236,10 @@ function events() {
 
   d3.selectAll('#nodes').selectAll('circle').on('mouseover', function () {
     d3.select(this).attr("r", 10)
+
+    let pie_id = get_pie_id(this.id.slice(2))
+    d3.select('body').select(pie_id).style("fill",function(d){return d3.color(pie_color(d.data.name)).darker(1);}).style("stroke","black")
+
     highlight_parent(this.id.slice(2));
     tooltip.style("left", d3.event.pageX+10+"px");
     tooltip.style("top", function(){ if(d3.event.pageY > tree_svg_height/2 )
@@ -249,24 +253,14 @@ function events() {
   })
 
     .on('mouseleave', function () {
-      d3.selectAll('#nodes').selectAll('circle').attr("r", function (d) {
-        if (d.depth == 1)
-          return max_circle_radius;
-        else if (d.child == 0 && d.depth == 2)
-          return 1;
-        else
-          return max_circle_radius;
-      }).attr("fill", function (d) {
-        if (d.bot == 1)
-          return 'red';
-        else
-          return 'blue';
-      })
+      reset_nodes();
+      let pie_id = get_pie_id(this.id.slice(2))
+      d3.select('body').select(pie_id).style("fill", function (d) { return pie_color(d.data.name); }).style("stroke","white")
 
-      d3.selectAll('#links').selectAll('line').attr("stroke-tree_svg_width", 1)
+      d3.selectAll('#links').selectAll('line').attr("stroke-width", 1)
         .attr("stroke", '#999')
         .attr("opacity", 0.6)
-        tooltip.style("display", "none");
+      tooltip.style("display", "none");
     })
 }
 
@@ -317,4 +311,33 @@ function dragended(d) {
   if (!d3.event.active) simulation.alphaTarget(0.0001);
   d.fx = null;
   d.fy = null;
+}
+
+function reset_nodes(){
+  d3.selectAll('#nodes').selectAll('circle').attr("r", function (d) {
+    if (d.depth == 1)
+      return max_circle_radius;
+    else if (d.child == 0 && d.depth == 2)
+      return 1;
+    else
+      return max_circle_radius;
+  }).attr("fill", function (d) {
+    if (d.bot == 1)
+      return 'red';
+    else
+      return 'blue';
+  })
+}
+
+function get_pie_id(id){
+    let time =  input_data[id].time.substring(11,13)
+    if (time >= 0 && time < 6) {
+      return "#PIE00"
+    } else if (time >= 6 && time < 12) {
+      return "#PIE06"
+    } else if (time >= 12 && time < 18) {
+      return "#PIE12"
+    } else if (time >= 18 && time < 24) {
+      return "#PIE18"
+    }
 }
