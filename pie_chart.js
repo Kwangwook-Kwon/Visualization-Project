@@ -112,7 +112,6 @@ function draw_pie_chart(data) {
         else
           return d3.color('blue').brighter(1);
       })
-      //console.log(d3.select('body').select("#nodes").select("#ID"+d))
     });
     d3.select(this).style("fill",function(d){return d3.color(pie_color(d.data.name)).darker(1);}).style("stroke","black")
   });

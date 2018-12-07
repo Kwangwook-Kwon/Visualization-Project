@@ -84,6 +84,8 @@ function update_tree(data) {
   d3.select("#links").remove()
   d3.select("#loading").remove()
 
+  tree_svg.on('.zoom', null);
+
   prepare_data()
 
   simulation
@@ -242,12 +244,14 @@ function ticked() {
     tree_svg.select("#border").style("fill", 'none')
     tree_svg.style('cursor','wait')
     if(zoom_check){
+      zoom_handler = d3.zoom().on("zoom", zoom_actions);
       zoom_handler(tree_svg);
       tree_svg.style('cursor','move')
     }else{
       tree_svg.style('cursor','Crosshair')
     }
   }else{
+    if(!loaded)
     tree_svg.style('cursor','wait')
   }
 }
@@ -367,7 +371,7 @@ function get_pie_id(id) {
 function change_tree_mode() {
   zoom_check = d3.select("#treeCheckbox").property("checked")
   zoom_handler = d3.zoom().on("zoom", zoom_actions);
-  if(zoom_check){
+  if(zoom_check&&loaded){
     zoom_handler = d3.zoom().on("zoom", zoom_actions);
     zoom_handler(tree_svg);
     tree_svg.style('cursor','move')
