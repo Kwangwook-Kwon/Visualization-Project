@@ -8,7 +8,7 @@ let zoom_check;
 
 let tree_svg = d3.select('body').append('div').attr("id", "treearea").attr('class', 'treeArea').append('svg').attr('width', tree_svg_width).attr('height', tree_svg_height).attr("id", "Tree")
 d3.select("#treearea").append('input').attr('type', 'checkbox').attr('id', 'treeCheckbox').on("change", change_tree_mode).style('position', 'absolute').style('left', '10px').style('top', '7px')
-d3.select("#treearea").append('text').text('Zoom & Move').style('position', 'absolute').style('left', '30px').style('top', '5px').style('background','white')
+d3.select("#treearea").append('text').text('Zoom & Move').style('position', 'absolute').style('left', '30px').style('top', '5px').style('background', 'white')
 
 
 
@@ -21,8 +21,29 @@ tree_svg.append("rect").attr("id", "border")
   .style("fill", "white")
   .style("stroke-width", 1);
 
+let brush = d3.brush()
+  .extent([[0, 0], [tree_svg_width, tree_svg_height]])
+  .on("start brush", brushed)
+  .on("end", brushended);
 
+function brushed() {
+  console.log(d3.event.selection);
+  var s = d3.event.selection,
+    x0 = s[0][0],
+    y0 = s[0][1],
+    x1 = s[1][0],
+    y1 = s[1][1],
+    dx = s[1][0] - x0,
+    dy = s[1][1] - y0;
+  //console.log("("+x0+","+y0+")-("+x1+","+y1+")");
+}
 
+function brushended() {
+  console.log('end');
+  if (!d3.event.selection) {
+    console.log('There is no selection');
+  }
+}
 let tooltip = d3.select("body")
   .append("div").attr("class", "toolTip").attr("id", "toolTip")
 
@@ -68,13 +89,12 @@ function initialize_graph() {
     .on("tick", ticked)
 
   draw_nodes_links()
-
 }
 
 function update_tree(data) {
   input_data = data
   loaded = 0
-
+  tree_svg.selectAll("#brush").remove()
   key = Object.keys(input_data)
   nodes = []
   links = []
@@ -216,15 +236,15 @@ function draw_nodes_links() {
 }
 
 function zoom_actions() {
-  if(zoom_check){
+  if (zoom_check) {
     tree_svg.selectAll('g').attr("transform", d3.event.transform)
-  }else{
+  } else {
     tree_svg.selectAll('g').attr("transform", null)
   }
 }
 
 function ticked() {
-  if ((100 - simulation.alpha() * 100) >= 98 || loaded == 1) {
+  if ((100 - simulation.alpha() * 100) >= 98 ) {
     node
       .attr("cx", function (d) { return d.x; })
       .attr("cy", function (d) { return d.y; })
@@ -234,32 +254,38 @@ function ticked() {
       .attr("y1", function (d) { return d.source.y; })
       .attr("x2", function (d) { return d.target.x; })
       .attr("y2", function (d) { return d.target.y; })
-      loaded = 1
   }
   let cur_alpha = simulation.alpha();
   d3.select("#progress").transition().text(Math.ceil(100 - cur_alpha * 100) + "%")
   d3.select("#bar").attr("width", Math.ceil(100 - cur_alpha * 100) * 4).style("fill", d3.interpolateCool(1 - cur_alpha))
-  if (Math.ceil(100 - simulation.alpha() * 100) >= 99) {
+  if (Math.ceil(100 - cur_alpha * 100) >= 99 && loaded == 0) {
     d3.selectAll("#loading").remove();
     tree_svg.select("#border").style("fill", 'none')
-    tree_svg.style('cursor','wait')
-    if(zoom_check){
+    tree_svg.style('cursor', 'wait')
+    if (zoom_check) {
       zoom_handler = d3.zoom().on("zoom", zoom_actions);
       zoom_handler(tree_svg);
-      tree_svg.style('cursor','move')
-    }else{
-      tree_svg.style('cursor','Crosshair')
+      tree_svg.style('cursor', 'move')
+      tree_svg.selectAll("#brush").remove()
+    } else {
+      tree_svg.append("g")
+      .attr("class", "brush").attr("id", "brush")
+      .call(brush);
+      tree_svg.style('cursor', 'Crosshair')
     }
-  }else{
-    if(!loaded)
-    tree_svg.style('cursor','wait')
+    loaded = 1; 
+  } else if(Math.ceil(100 - cur_alpha * 100) < 99) {
+    tree_svg.selectAll("#brush").remove()
+    loaded = 0;
+    tree_svg.style('cursor', 'wait')
   }
 }
+
 
 function events() {
 
   d3.selectAll('#nodes').selectAll('circle').on('mouseover', function () {
-    d3.select(this).attr("r", 10)
+    d3.select(this).attr("r", 10).moveToFront();
 
     let pie_id = get_pie_id(this.id.slice(2))
     d3.select('body').select(pie_id).style("fill", function (d) { return d3.color(pie_color(d.data.name)).darker(1); }).style("stroke", "black")
@@ -371,12 +397,16 @@ function get_pie_id(id) {
 function change_tree_mode() {
   zoom_check = d3.select("#treeCheckbox").property("checked")
   zoom_handler = d3.zoom().on("zoom", zoom_actions);
-  if(zoom_check&&loaded){
+  if (zoom_check && loaded) {
     zoom_handler = d3.zoom().on("zoom", zoom_actions);
     zoom_handler(tree_svg);
-    tree_svg.style('cursor','move')
-  }else{
+    tree_svg.style('cursor', 'move')
+    tree_svg.selectAll("#brush").remove()
+  } else {
+    tree_svg.append("g")
+      .attr("class", "brush").attr("id", "brush")
+      .call(brush);
     tree_svg.on('.zoom', null);
-    tree_svg.style('cursor','crosshair')
+    tree_svg.style('cursor', 'crosshair')
   }
 }
