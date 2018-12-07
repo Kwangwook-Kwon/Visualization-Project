@@ -8,7 +8,7 @@ let zoom_check;
 
 let tree_svg = d3.select('body').append('div').attr("id", "treearea").attr('class', 'treeArea').append('svg').attr('width', tree_svg_width).attr('height', tree_svg_height).attr("id", "Tree")
 d3.select("#treearea").append('input').attr('type', 'checkbox').attr('id', 'treeCheckbox').on("change", change_tree_mode).style('position', 'absolute').style('left', '10px').style('top', '7px')
-d3.select("#treearea").append('text').text('Zoom & Move').style('position', 'absolute').style('left', '30px').style('top', '5px').style('background', 'white')
+d3.select("#treearea").append('text').text('Zoom&Move').style('position', 'absolute').style('left', '30px').style('top', '5px').style('background', 'white')
 
 
 
@@ -244,7 +244,8 @@ function zoom_actions() {
 }
 
 function ticked() {
-  if ((100 - simulation.alpha() * 100) >= 98 ) {
+  let cur_alpha = simulation.alpha();
+  if ((100 - cur_alpha * 100) >= 99 ) {
     node
       .attr("cx", function (d) { return d.x; })
       .attr("cy", function (d) { return d.y; })
@@ -255,7 +256,6 @@ function ticked() {
       .attr("x2", function (d) { return d.target.x; })
       .attr("y2", function (d) { return d.target.y; })
   }
-  let cur_alpha = simulation.alpha();
   d3.select("#progress").transition().text(Math.ceil(100 - cur_alpha * 100) + "%")
   d3.select("#bar").attr("width", Math.ceil(100 - cur_alpha * 100) * 4).style("fill", d3.interpolateCool(1 - cur_alpha))
   if (Math.ceil(100 - cur_alpha * 100) >= 99 && loaded == 0) {
