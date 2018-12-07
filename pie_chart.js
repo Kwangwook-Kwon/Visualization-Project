@@ -104,8 +104,9 @@ function draw_pie_chart(data) {
   });
 
   d3.selectAll("path").on("mouseover", function (d) {
+    d3.select('body').select("#nodes").selectAll('circle').style("opacity",0.3)
     d.data.nodes.forEach(function(d){
-      d3.select('body').select("#nodes").select("#ID"+d).attr("r",3).attr("fill", function (d) {
+      d3.select('body').select("#nodes").select("#ID"+d).attr("r",3).style("opacity",1).attr("fill", function (d) {
         if (d.bot == 1)
           return d3.color('red').brighter(1);
         else

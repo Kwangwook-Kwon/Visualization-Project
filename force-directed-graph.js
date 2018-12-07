@@ -326,7 +326,7 @@ function reset_nodes(){
       return 'red';
     else
       return 'blue';
-  })
+  }).style("opacity",1)
 }
 
 function get_pie_id(id){
