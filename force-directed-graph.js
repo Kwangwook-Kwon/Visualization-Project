@@ -245,6 +245,7 @@ function events() {
     })
     tooltip.style("display", "inline-block");
     tooltip.html(input_data[this.id.slice(2)].time+"<br>"+input_data[this.id.slice(2)].text + "<br>"+input_data[this.id.slice(2)].screen_name );
+    tooltip.moveToFront();
   })
 
     .on('mouseleave', function () {
