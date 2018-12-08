@@ -23,25 +23,47 @@ tree_svg.append("rect").attr("id", "border")
 
 let brush = d3.brush()
   .extent([[0, 0], [tree_svg_width, tree_svg_height]])
-  .on("start brush", brushed)
+  .on("brush", brushed)
   .on("end", brushended);
 
 function brushed() {
-  console.log(d3.event.selection);
-  var s = d3.event.selection,
-    x0 = s[0][0],
-    y0 = s[0][1],
-    x1 = s[1][0],
-    y1 = s[1][1],
-    dx = s[1][0] - x0,
-    dy = s[1][1] - y0;
-  //console.log("("+x0+","+y0+")-("+x1+","+y1+")");
+  if (d3.event.selection != null) {
+
+    // revert circles to initial style
+    tree_svg.selectAll('circle').attr("class", "unbrushed");
+    var brush_coords = d3.brushSelection(this);
+
+    // style brushed circles
+    tree_svg.selectAll('circle').filter(function () {
+
+      let cx = d3.select(this).attr("cx"),
+        cy = d3.select(this).attr("cy");
+
+      return isBrushed(brush_coords, cx, cy);
+    })
+      .attr("class", "brushed").style('stroke', function (d) {
+        if (d.bot == 1)
+          return 'red';
+        else
+          return 'blue';
+      })
+  }
+}
+function isBrushed(brush_coords, cx, cy) {
+
+  var x0 = brush_coords[0][0],
+    x1 = brush_coords[1][0],
+    y0 = brush_coords[0][1],
+    y1 = brush_coords[1][1];
+
+  return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1;
 }
 
 function brushended() {
   console.log('end');
   if (!d3.event.selection) {
     console.log('There is no selection');
+    tree_svg.selectAll('circle').attr("class", "unbrushed");
   }
 }
 let tooltip = d3.select("body")
@@ -245,7 +267,7 @@ function zoom_actions() {
 
 function ticked() {
   let cur_alpha = simulation.alpha();
-  if ((100 - cur_alpha * 100) >= 98 ) {
+  if ((100 - cur_alpha * 100) >= 98) {
     node
       .attr("cx", function (d) { return d.x; })
       .attr("cy", function (d) { return d.y; })
@@ -269,15 +291,15 @@ function ticked() {
       tree_svg.selectAll("#brush").remove()
     } else {
       tree_svg.append("g")
-      .attr("class", "brush").attr("id", "brush")
-      .call(brush);
+        .attr("class", "brush").attr("id", "brush")
+        .call(brush);
       tree_svg.select('#brush').moveToBack()
       tree_svg.style('cursor', 'Crosshair')
       //tree_svg.select('#nodes').selectAll('circle').moveToFront()
     }
-    loaded = 1; 
-  } 
-  if(Math.ceil(100 - cur_alpha * 100) < 99) {
+    loaded = 1;
+  }
+  if (Math.ceil(100 - cur_alpha * 100) < 99) {
     tree_svg.selectAll("#brush").remove()
     loaded = 0;
     tree_svg.style('cursor', 'wait')
@@ -407,7 +429,10 @@ function change_tree_mode() {
     tree_svg.selectAll("#brush").remove()
   } else {
     tree_svg.append("g")
-      .attr("class", "brush").attr("id", "brush")
+      .attr("class", "brush").attr("id", "brush").attr('transform', function () {
+        console.log(tree_svg.select('#nodes').attr('transform'))
+        return tree_svg.select('#nodes').attr('transform');
+      })
       .call(brush);
     tree_svg.select('#brush').moveToBack()
     tree_svg.on('.zoom', null);
