@@ -245,7 +245,7 @@ function zoom_actions() {
 
 function ticked() {
   let cur_alpha = simulation.alpha();
-  if ((100 - cur_alpha * 100) >= 99 ) {
+  if ((100 - cur_alpha * 100) >= 98 ) {
     node
       .attr("cx", function (d) { return d.x; })
       .attr("cy", function (d) { return d.y; })
@@ -271,10 +271,13 @@ function ticked() {
       tree_svg.append("g")
       .attr("class", "brush").attr("id", "brush")
       .call(brush);
+      tree_svg.select('#brush').moveToBack()
       tree_svg.style('cursor', 'Crosshair')
+      //tree_svg.select('#nodes').selectAll('circle').moveToFront()
     }
     loaded = 1; 
-  } else if(Math.ceil(100 - cur_alpha * 100) < 99) {
+  } 
+  if(Math.ceil(100 - cur_alpha * 100) < 99) {
     tree_svg.selectAll("#brush").remove()
     loaded = 0;
     tree_svg.style('cursor', 'wait')
@@ -406,6 +409,7 @@ function change_tree_mode() {
     tree_svg.append("g")
       .attr("class", "brush").attr("id", "brush")
       .call(brush);
+    tree_svg.select('#brush').moveToBack()
     tree_svg.on('.zoom', null);
     tree_svg.style('cursor', 'crosshair')
   }
