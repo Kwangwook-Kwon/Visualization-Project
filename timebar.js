@@ -18,7 +18,7 @@ function draw_bar_chart(data) {
 
     var margin = {top: 20, right: 20, bottom: 70, left: 40},
     width = 600 - margin.left - margin.right,
-    height = 400 - margin.top - margin.bottom;
+    height = 500 - margin.top - margin.bottom;
 
     var	parseDate = d3.timeParse("%d-%b-%Y")
 

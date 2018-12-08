@@ -47,8 +47,8 @@ function draw_pie_chart(data) {
   { name: "18:00-24:00", total: cnt_18_24, percent: (cnt_18_24 / key.length) * 100, nodes: nodes_18_24 }];
 
 
-  var width = 500,
-    height = 500,
+  var width = 350,
+    height = 350,
     radius = Math.min(width, height) / 2;
 
   var arc = d3.arc()
