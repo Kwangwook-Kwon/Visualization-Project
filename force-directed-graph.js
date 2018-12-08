@@ -267,7 +267,7 @@ function zoom_actions() {
 
 function ticked() {
   let cur_alpha = simulation.alpha();
-  if ((100 - cur_alpha * 100) >= 98) {
+  if ((100 - cur_alpha * 100) >= 98 || loaded == 1) {
     node
       .attr("cx", function (d) { return d.x; })
       .attr("cy", function (d) { return d.y; })
@@ -299,11 +299,10 @@ function ticked() {
     }
     loaded = 1;
   }
-  if (Math.ceil(100 - cur_alpha * 100) < 99) {
-    tree_svg.selectAll("#brush").remove()
-    loaded = 0;
-    tree_svg.style('cursor', 'wait')
-  }
+  //if (Math.ceil(100 - cur_alpha * 100) < 99) {
+  //  tree_svg.selectAll("#brush").remove()
+  //  tree_svg.style('cursor', 'wait')
+  //}
 }
 
 
