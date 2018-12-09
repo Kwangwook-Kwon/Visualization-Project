@@ -61,6 +61,7 @@ function update_pie_chart_from_tree(data, brushed) {
   nodes_06_12 = [];
   nodes_12_18 = [];
   nodes_18_24 = [];
+  console.log(data.length);
   if (!brushed) {
     key = key = Object.keys(data)
     for (i = 0; i < key.length; i++) {
@@ -162,7 +163,7 @@ g.append("text")
 d3.selectAll("path").on("mousemove", function (d) {
   div.style("left", d3.event.pageX + 10 + "px");
   div.style("top", d3.event.pageY - 25 + "px");
-  div.style("display", "inline-block");
+  div.style("display", "inline-block").moveToFront();
   div.html((d.data.name) + "<br>" + (d.data.total) + "<br>" + (Math.ceil(d.data.percent)) + "%");
 });
 

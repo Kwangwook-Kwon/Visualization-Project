@@ -440,11 +440,11 @@ function brushended() {
   console.log('end');
   let d_brushed =  d3.selectAll(".brushed").data();
   console.log(d_brushed)
-  if (!d3.event.selection) {
+  if (!d3.event.selection || d_brushed.length == 0 ) {
     console.log('There is no selection');
     update_pie_chart_from_tree(input_data, false)
     tree_svg.selectAll('circle').attr("class", "unbrushed");
   }else{
-    update_pie_chart_from_tree(d_brushed, true) 
+      update_pie_chart_from_tree(d_brushed, true) 
   }
 }
