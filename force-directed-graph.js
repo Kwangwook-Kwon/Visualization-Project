@@ -51,7 +51,7 @@ function brushed() {
 }
 function isBrushed(brush_coords, cx, cy) {
 
-  var x0 = brush_coords[0][0],
+  let x0 = brush_coords[0][0],
     x1 = brush_coords[1][0],
     y0 = brush_coords[0][1],
     y1 = brush_coords[1][1];
@@ -61,9 +61,14 @@ function isBrushed(brush_coords, cx, cy) {
 
 function brushended() {
   console.log('end');
+  let d_brushed =  d3.selectAll(".brushed").data();
+  console.log(d_brushed)
   if (!d3.event.selection) {
     console.log('There is no selection');
+    update_pie_chart_from_tree(input_data, false)
     tree_svg.selectAll('circle').attr("class", "unbrushed");
+  }else{
+    update_pie_chart_from_tree(d_brushed, true) 
   }
 }
 let tooltip = d3.select("body")
@@ -163,7 +168,8 @@ function prepare_data() {
       depth: input_data[key[i]].depth,
       child: input_data[key[i]].child,
       parent: input_data[key[i]].parent_tweet,
-      bot: input_data[key[i]].bot
+      bot: input_data[key[i]].bot,
+      time : input_data[key[i]].time
     };
   });
 
@@ -425,7 +431,9 @@ function change_tree_mode() {
     zoom_handler = d3.zoom().on("zoom", zoom_actions);
     zoom_handler(tree_svg);
     tree_svg.style('cursor', 'move')
+    tree_svg.selectAll('circle').attr('class','unbrushd')
     tree_svg.selectAll("#brush").remove()
+    update_pie_chart_from_tree(input_data, false)
   } else {
     tree_svg.append("g")
       .attr("class", "brush").attr("id", "brush").attr('transform', function () {
