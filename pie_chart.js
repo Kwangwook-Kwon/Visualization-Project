@@ -49,7 +49,6 @@ function draw_pie_chart(data) {
 
 }
 
-
 function update_pie_chart_from_tree(data, brushed) {
   d3.selectAll('.pieArea').remove()
   cnt_00_06 = 0;
@@ -111,8 +110,8 @@ function update_pie_chart_from_tree(data, brushed) {
 }
 
 function draw_chart(){
-  var width = 500,
-  height = 500,
+  var width = 350,
+  height = 350,
   radius = Math.min(width, height) / 2;
 
 var arc = d3.arc()
