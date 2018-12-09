@@ -11,6 +11,8 @@ let nodes_12_18 = [];
 let nodes_18_24 = [];
 let dataset;
 
+let div = d3.select("body").append("div").attr("class", "toolTip");
+
 function initId(selected_file, isFirst) {
   d3.json("./Twitter_Data/RetweetNew/" + selected_file + ".json").then(draw_pie_chart)
 
@@ -100,10 +102,10 @@ function update_pie_chart_from_tree(data, brushed) {
         nodes_18_24.push(data[i].id);
       }
     }
-    dataset = [{ name: "00:00-06:00", total: cnt_00_06, percent: (cnt_00_06 / key.length) * 100, nodes: nodes_00_06 },
-    { name: "06:00-12:00", total: cnt_06_12, percent: (cnt_06_12 / key.length) * 100, nodes: nodes_06_12 },
-    { name: "12:00-18:00", total: cnt_12_18, percent: (cnt_12_18 / key.length) * 100, nodes: nodes_12_18 },
-    { name: "18:00-24:00", total: cnt_18_24, percent: (cnt_18_24 / key.length) * 100, nodes: nodes_18_24 }];
+    dataset = [{ name: "00:00-06:00", total: cnt_00_06, percent: (cnt_00_06 / data.length) * 100, nodes: nodes_00_06 },
+    { name: "06:00-12:00", total: cnt_06_12, percent: (cnt_06_12 / data.length) * 100, nodes: nodes_06_12 },
+    { name: "12:00-18:00", total: cnt_12_18, percent: (cnt_12_18 / data.length) * 100, nodes: nodes_12_18 },
+    { name: "18:00-24:00", total: cnt_18_24, percent: (cnt_18_24 / data.length) * 100, nodes: nodes_18_24 }];
   }
 
   draw_chart()
@@ -130,8 +132,6 @@ var svg = d3.select("body").append('div').attr('class', 'pieArea').append("svg")
   .attr("class", "piechart")
   .append("g")
   .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-
-var div = d3.select("body").append("div").attr("class", "toolTip");
 
 var g = svg.selectAll(".arc")
   .data(pie(dataset.filter(function(d){return d.total > 0 ;})))
@@ -163,7 +163,7 @@ d3.selectAll("path").on("mousemove", function (d) {
   div.style("left", d3.event.pageX + 10 + "px");
   div.style("top", d3.event.pageY - 25 + "px");
   div.style("display", "inline-block");
-  div.html((d.data.name) + "<br>" + (d.data.total) + "<br>" + (d.data.percent) + "%");
+  div.html((d.data.name) + "<br>" + (d.data.total) + "<br>" + (Math.ceil(d.data.percent)) + "%");
 });
 
 d3.selectAll("path").on("mouseover", function (d) {

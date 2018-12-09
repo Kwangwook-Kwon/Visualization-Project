@@ -26,51 +26,6 @@ let brush = d3.brush()
   .on("brush", brushed)
   .on("end", brushended);
 
-function brushed() {
-  if (d3.event.selection != null) {
-
-    // revert circles to initial style
-    tree_svg.selectAll('circle').attr("class", "unbrushed");
-    var brush_coords = d3.brushSelection(this);
-
-    // style brushed circles
-    tree_svg.selectAll('circle').filter(function () {
-
-      let cx = d3.select(this).attr("cx"),
-        cy = d3.select(this).attr("cy");
-
-      return isBrushed(brush_coords, cx, cy);
-    })
-      .attr("class", "brushed").style('stroke', function (d) {
-        if (d.bot == 1)
-          return 'red';
-        else
-          return 'blue';
-      })
-  }
-}
-function isBrushed(brush_coords, cx, cy) {
-
-  let x0 = brush_coords[0][0],
-    x1 = brush_coords[1][0],
-    y0 = brush_coords[0][1],
-    y1 = brush_coords[1][1];
-
-  return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1;
-}
-
-function brushended() {
-  console.log('end');
-  let d_brushed =  d3.selectAll(".brushed").data();
-  console.log(d_brushed)
-  if (!d3.event.selection) {
-    console.log('There is no selection');
-    update_pie_chart_from_tree(input_data, false)
-    tree_svg.selectAll('circle').attr("class", "unbrushed");
-  }else{
-    update_pie_chart_from_tree(d_brushed, true) 
-  }
-}
 let tooltip = d3.select("body")
   .append("div").attr("class", "toolTip").attr("id", "toolTip")
 
@@ -432,8 +387,9 @@ function change_tree_mode() {
     zoom_handler(tree_svg);
     tree_svg.style('cursor', 'move')
     tree_svg.selectAll('circle').attr('class','unbrushd')
-    tree_svg.selectAll("#brush").remove()
+    reset_nodes();
     update_pie_chart_from_tree(input_data, false)
+    tree_svg.selectAll("#brush").remove()
   } else {
     tree_svg.append("g")
       .attr("class", "brush").attr("id", "brush").attr('transform', function () {
@@ -444,5 +400,51 @@ function change_tree_mode() {
     tree_svg.select('#brush').moveToBack()
     tree_svg.on('.zoom', null);
     tree_svg.style('cursor', 'crosshair')
+  }
+}
+
+function brushed() {
+  if (d3.event.selection != null) {
+
+    // revert circles to initial style
+    tree_svg.selectAll('circle').attr("class", "unbrushed");
+    var brush_coords = d3.brushSelection(this);
+
+    // style brushed circles
+    tree_svg.selectAll('circle').filter(function () {
+
+      let cx = d3.select(this).attr("cx"),
+        cy = d3.select(this).attr("cy");
+
+      return isBrushed(brush_coords, cx, cy);
+    })
+      .attr("class", "brushed").style('stroke', function (d) {
+        if (d.bot == 1)
+          return 'red';
+        else
+          return 'blue';
+      })
+  }
+}
+function isBrushed(brush_coords, cx, cy) {
+
+  let x0 = brush_coords[0][0],
+    x1 = brush_coords[1][0],
+    y0 = brush_coords[0][1],
+    y1 = brush_coords[1][1];
+
+  return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1;
+}
+
+function brushended() {
+  console.log('end');
+  let d_brushed =  d3.selectAll(".brushed").data();
+  console.log(d_brushed)
+  if (!d3.event.selection) {
+    console.log('There is no selection');
+    update_pie_chart_from_tree(input_data, false)
+    tree_svg.selectAll('circle').attr("class", "unbrushed");
+  }else{
+    update_pie_chart_from_tree(d_brushed, true) 
   }
 }
