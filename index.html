@@ -69,10 +69,17 @@
   }
   .pieArea {
     position: absolute;
-    width: 590px;
+    width: 350px;
     height: 350px;
     left: 1010px;
     top: 50px;
+  }
+  .ratioArea {
+    position: absolute;
+    width: 350px;
+    height: 30px;
+    left: 700px;
+    top: 800px;
   }
   .barArea {
     position: absolute;
@@ -81,6 +88,17 @@
     left: 1010px;
     top: 400px;
   }
+  .chart rect:first-of-type {
+  color: #fff;
+  stroke: #3994b6;
+  fill: white;
+}
+
+.chart rect:nth-of-type(2) {
+  color: #fff;
+  stroke: transparent;
+  fill: #3994b6;
+}
 
 </style>
 
@@ -90,4 +108,5 @@
   <script src="force-directed-graph.js"></script>
   <script src="pie_chart.js"></script>
   <script src="timebar.js"></script>
+  <script src="ratiobar.js"></script>
 </body>
