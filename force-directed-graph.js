@@ -162,6 +162,7 @@ function draw_nodes_links() {
     .data(nodes)
     .enter()
     .append("circle")
+    .attr("class","unbrushed")
     .attr("id", d => 'ID' + d.id)
     .attr("r", function (d) {
       if (d.depth == 1)
@@ -386,8 +387,8 @@ function change_tree_mode() {
     zoom_handler = d3.zoom().on("zoom", zoom_actions);
     zoom_handler(tree_svg);
     tree_svg.style('cursor', 'move')
-    tree_svg.selectAll('circle').attr('class','unbrushd')
     reset_nodes();
+    tree_svg.selectAll('circle').attr('class','unbrushed')
     update_pie_chart_from_tree(input_data, false)
     tree_svg.selectAll("#brush").remove()
   } else {
