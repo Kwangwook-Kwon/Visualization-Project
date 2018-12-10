@@ -166,16 +166,16 @@ function draw_chart() {
        return "./image/sun.png";
       if (d.data.name == "18:00-24:00")
         return "./image/sunset.png";
-   })
+   }).style("opacity", 0)
     .transition().delay(function (d, i) {
-      return i * 500;
-    }).duration(500)
+      return i * 300;
+    }).duration(300)
     .attr("height", 40)
     .attr("width", 40)
     .attr("transform", function (d) {
       let center = arc.centroid(d)
       return "translate(" + (+center[0] - 20) + "," + (center[1] - 20) + ")";
-    })
+    }).transition().style("opacity", 1)
   //g.append("text")
   //  .attr("transform", function (d) { return "translate(" + arc.centroid(d) + ")"; })
   //  .attr("dy", ".35em")
