@@ -389,7 +389,7 @@ function change_tree_mode() {
     tree_svg.style('cursor', 'move')
     reset_nodes();
     tree_svg.selectAll('circle').attr('class','unbrushed')
-    update_pie_chart_from_tree(input_data, false)
+    update_pie_chart(input_data)
     tree_svg.selectAll("#brush").remove()
   } else {
     tree_svg.append("g")
@@ -438,7 +438,6 @@ function isBrushed(brush_coords, cx, cy) {
 
 function brushended() {
   let d_brushed =  d3.selectAll(".brushed").data();
-  console.log(d_brushed)
   if (!d3.event.selection || d_brushed.length == 0 ) {
     update_pie_chart(input_data)
     draw_bar_chart(input_data)
