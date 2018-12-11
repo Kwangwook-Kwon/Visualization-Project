@@ -17,37 +17,58 @@ function draw_ratio_chart(data) {
         }
     }
 
-    var botData = [key.length, bot_cnt]; // here are the data values; v1 = total, v2 = current value
+    var botData = [key.length, bot_cnt];
   
-    var chart = d3.select("body").append('div').attr('class', 'ratioArea').append("svg") // creating the svg object inside the container div
+    let chart = d3.select("body")
+        .append('div')
+        .attr('class', 'ratioArea')
+        .append("svg") 
         .attr("class", "chart")
-        .attr("width", 300) // bar has a fixed width
+        .attr("width", 600) 
         .attr("height", 30 * botData.length);
   
-    var x = d3.scaleLinear() // takes the fixed width and creates the percentage from the data values
+    let x = d3.scaleLinear() 
         .domain([0, d3.max(botData)])
         .range([0, 300]); 
+    let xText = d3.scaleLinear() 
+        .domain([0, d3.max(botData)])
+        .range([40, 340]); 
     
-    chart.selectAll("rect") // this is what actually creates the bars
+        chart.append("image")
+  .attr("id", "bot")
+  .attr("xlink:href", "./image/bot_image.png")
+    .attr("height", 30)
+    .attr("width", 30)
+
+    chart.append("image")
+    .attr("id", "human")
+    .attr("xlink:href", "./image/human_image.png")
+      .attr("height", 30)
+      .attr("width", 30)
+      .attr("x", 350)
+   
+    chart.selectAll("rect") 
         .data(botData)
         .enter().append("rect")
         .transition()
         .delay(function (d, i) {
-            return i * 300;})
+            return i * 200;})
         .duration(300)
         .attr("width", x)
         .attr("height", 30)
-        .attr("rx", 5) // rounded corners
-        .attr("ry", 5);
+        .attr("rx", 5) 
+        .attr("ry", 5)
+        .attr("x", 40)
+        .attr("align", "center");
     
-    chart.selectAll("text") // adding the text labels to the bar
+    chart.selectAll("text") 
         .data(botData)
         .enter().append("text")
-        .attr("x", x)
-        .attr("y", 10) // y position of the text inside bar
-        .attr("dx", -3) // padding-right
-        .attr("dy", ".35em") // vertical-align: middle
-        .attr("text-anchor", "end") // text-align: right
+        .attr("x", xText)
+        .attr("y", 10) 
+        .attr("dx", -3) 
+        .attr("dy", ".35em") 
+        .attr("text-anchor", "end")
         .text(String);
 }
     
