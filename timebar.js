@@ -93,6 +93,10 @@ function draw_bar_chart(data) {
     svg.selectAll("bar")
         .data(dataset)
         .enter().append("rect")
+        .transition()
+        .delay(function (d, i) {
+            return i * 100;})
+        .duration(300)
         .style("fill", "steelblue")
         .attr("x", function (d) { return x(d.key); })
         .attr("width", x.bandwidth())
