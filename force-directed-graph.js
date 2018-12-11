@@ -440,6 +440,7 @@ function brushended() {
   let d_brushed =  d3.selectAll(".brushed").data();
   if (!d3.event.selection || d_brushed.length == 0 ) {
     update_pie_chart(input_data)
+    draw_bar_chart(input_data)
     tree_svg.selectAll('circle').attr("class", "unbrushed");
   }else{
       update_pie_chart(d_brushed) 
