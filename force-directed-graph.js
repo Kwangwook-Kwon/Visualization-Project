@@ -394,7 +394,6 @@ function change_tree_mode() {
   } else {
     tree_svg.append("g")
       .attr("class", "brush").attr("id", "brush").attr('transform', function () {
-        console.log(tree_svg.select('#nodes').attr('transform'))
         return tree_svg.select('#nodes').attr('transform');
       })
       .call(brush);
@@ -438,14 +437,12 @@ function isBrushed(brush_coords, cx, cy) {
 }
 
 function brushended() {
-  console.log('end');
   let d_brushed =  d3.selectAll(".brushed").data();
-  console.log(d_brushed)
   if (!d3.event.selection || d_brushed.length == 0 ) {
-    console.log('There is no selection');
-    update_pie_chart_from_tree(input_data, false)
+    update_pie_chart(input_data)
     tree_svg.selectAll('circle').attr("class", "unbrushed");
   }else{
-      update_pie_chart_from_tree(d_brushed, true) 
+      update_pie_chart(d_brushed) 
+      draw_bar_chart(d_brushed)
   }
 }

@@ -10,19 +10,41 @@ let nodes_06_12 = [];
 let nodes_12_18 = [];
 let nodes_18_24 = [];
 let dataset;
-
+let pie_svg;
 let div = d3.select("body").append("div").attr("class", "toolTip");
 
-function initId(selected_file, isFirst) {
-  d3.json("./Twitter_Data/RetweetNew/" + selected_file + ".json").then(draw_pie_chart)
-
-  if (!isFirst) {
-    d3.selectAll(".piechart").remove();
-  }
+function initial_draw_pie(selected_file) {
+  d3.json("./Twitter_Data/RetweetNew/" + selected_file + ".json").then(initial_draw_pie_chart)
 }
 
-function draw_pie_chart(data) {
+function update_pie(selected_file) {
+  d3.json("./Twitter_Data/RetweetNew/" + selected_file + ".json").then(update_pie_chart)
+}
 
+function initial_draw_pie_chart(data) {
+
+  prepare_pie_data(data)
+
+  draw_pie_chart()
+}
+
+function update_pie_chart(data) {
+  
+  pie_svg.transition().duration(1000).style('opacity',0).transition().delay(1500).remove()
+  
+  cnt_00_06 = 0;
+  cnt_06_12 = 0;
+  cnt_12_18 = 0;
+  cnt_18_24 = 0;
+  nodes_00_06 = [];
+  nodes_06_12 = [];
+  nodes_12_18 = [];
+  nodes_18_24 = [];
+  prepare_pie_data(data)
+  draw_pie_chart()
+}
+
+function prepare_pie_data(data) {
   key = Object.keys(data)
 
   for (i = 0; i < key.length; i++) {
@@ -46,73 +68,10 @@ function draw_pie_chart(data) {
   { name: "06:00-12:00", total: cnt_06_12, percent: (cnt_06_12 / key.length) * 100, nodes: nodes_06_12 },
   { name: "12:00-18:00", total: cnt_12_18, percent: (cnt_12_18 / key.length) * 100, nodes: nodes_12_18 },
   { name: "18:00-24:00", total: cnt_18_24, percent: (cnt_18_24 / key.length) * 100, nodes: nodes_18_24 }];
-
-  draw_chart()
-
 }
 
-function update_pie_chart_from_tree(data, brushed) {
-  d3.selectAll('.pieArea').remove()
-  cnt_00_06 = 0;
-  cnt_06_12 = 0;
-  cnt_12_18 = 0;
-  cnt_18_24 = 0;
-  nodes_00_06 = [];
-  nodes_06_12 = [];
-  nodes_12_18 = [];
-  nodes_18_24 = [];
-  console.log(data.length);
-  if (!brushed) {
-    key = key = Object.keys(data)
-    for (i = 0; i < key.length; i++) {
-      let time = data[key[i]].time.substring(11, 13);
+function draw_pie_chart() {
 
-      if (time >= 0 && time < 6) {
-        cnt_00_06++;
-        nodes_00_06.push(key[i]);
-      } else if (time >= 6 && time < 12) {
-        cnt_06_12++;
-        nodes_06_12.push(key[i]);
-      } else if (time >= 12 && time < 18) {
-        cnt_12_18++;
-        nodes_12_18.push(key[i]);
-      } else if (time >= 18 && time < 24) {
-        cnt_18_24++;
-        nodes_18_24.push(key[i]);
-      }
-    }
-    dataset = [{ name: "00:00-06:00", total: cnt_00_06, percent: (cnt_00_06 / key.length) * 100, nodes: nodes_00_06 },
-    { name: "06:00-12:00", total: cnt_06_12, percent: (cnt_06_12 / key.length) * 100, nodes: nodes_06_12 },
-    { name: "12:00-18:00", total: cnt_12_18, percent: (cnt_12_18 / key.length) * 100, nodes: nodes_12_18 },
-    { name: "18:00-24:00", total: cnt_18_24, percent: (cnt_18_24 / key.length) * 100, nodes: nodes_18_24 }];
-  } else {
-    for (i = 0; i < data.length; i++) {
-      let time = data[i].time.substring(11, 13);
-
-      if (time >= 0 && time < 6) {
-        cnt_00_06++;
-        nodes_00_06.push(data[i].id);
-      } else if (time >= 6 && time < 12) {
-        cnt_06_12++;
-        nodes_06_12.push(data[i].id);
-      } else if (time >= 12 && time < 18) {
-        cnt_12_18++;
-        nodes_12_18.push(data[i].id);
-      } else if (time >= 18 && time < 24) {
-        cnt_18_24++;
-        nodes_18_24.push(data[i].id);
-      }
-    }
-    dataset = [{ name: "00:00-06:00", total: cnt_00_06, percent: (cnt_00_06 / data.length) * 100, nodes: nodes_00_06 },
-    { name: "06:00-12:00", total: cnt_06_12, percent: (cnt_06_12 / data.length) * 100, nodes: nodes_06_12 },
-    { name: "12:00-18:00", total: cnt_12_18, percent: (cnt_12_18 / data.length) * 100, nodes: nodes_12_18 },
-    { name: "18:00-24:00", total: cnt_18_24, percent: (cnt_18_24 / data.length) * 100, nodes: nodes_18_24 }];
-  }
-
-  draw_chart()
-}
-
-function draw_chart() {
   var width = 350,
     height = 350,
     radius = Math.min(width, height) / 2;
@@ -127,26 +86,23 @@ function draw_chart() {
     .endAngle(3.1 * Math.PI)
     .value(function (d) { return d.total; });
 
-  var svg = d3.select("body").append('div').attr('class', 'pieArea').append("svg")
+  pie_svg = d3.select("body").append('div').attr('class', 'pieArea').append("svg")
     .attr("width", width)
     .attr("height", height)
     .attr("class", "piechart")
-    .append("g")
+  var pie_g =  pie_svg.append("g")
     .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-  var g = svg.selectAll(".arc").append("g")
+  var g = pie_g.selectAll(".arc").append("g")
     .data(pie(dataset.filter(function (d) { return d.total > 0; })))
     .enter()
-    //.append("g")
-    //.attr("class", "arc").attr('id', 'arc')
 
   g.append("path")
     .attr("id", d => "PIE" + d.data.name.substring(0, 2))
     .style("fill", function (d) { return pie_color(d.data.name); })
     .transition()
-    .delay(function (d, i) {
-      return i * 300;})
-    .duration(300)
+    .delay(1000)
+    .duration(1000)
     .attrTween('d', function (d) {
       var i = d3.interpolate(d.startAngle + 0.1, d.endAngle);
       return function (t) {
@@ -163,25 +119,19 @@ function draw_chart() {
      if (d.data.name == "06:00-12:00")
        return "./image/sunrise.png";
       if (d.data.name == "12:00-18:00")
-       return "./image/sun.png";
+        return "./image/sun.png";
       if (d.data.name == "18:00-24:00")
         return "./image/sunset.png";
-   }).style("opacity", 0)
-    .transition().delay(function (d, i) {
-      return i * 300;
-    }).duration(300)
+    }).style("opacity", 0)
+    .transition()    
+    .delay(1000)
+    .duration(1000)
     .attr("height", 40)
     .attr("width", 40)
     .attr("transform", function (d) {
       let center = arc.centroid(d)
       return "translate(" + (+center[0] - 20) + "," + (center[1] - 20) + ")";
     }).transition().style("opacity", 1)
-  //g.append("text")
-  //  .attr("transform", function (d) { return "translate(" + arc.centroid(d) + ")"; })
-  //  .attr("dy", ".35em")
-  //  .transition()
-  //  .delay(1000)
-  //  .text(function (d) { return d.data.name; });
 
   d3.selectAll("path, image").on("mousemove", function (d) {
     div.style("left", d3.event.pageX + 10 + "px");
@@ -200,18 +150,11 @@ function draw_chart() {
           return d3.color('blue').brighter(1);
       })
     });
-    //d3.select('.piechart').selectAll('path').select(this.id).style("fill", function (d) { return d3.color(pie_color(d.data.name)).darker(1); }).style("stroke", "black")
   });
 
-d3.selectAll("path, image").on("mouseout", function (d) {
-  div.style("display", "none");
-  reset_nodes();
- //d3.select(this).style("fill", function (d) { return d3.color(pie_color(d.data.name)); }).style("stroke", "white")
-});
-
-  function type(d) {
-    d.total = +d.total;
-    return d;
-  }
+  d3.selectAll("path, image").on("mouseout", function (d) {
+    div.style("display", "none");
+    reset_nodes();
+  });
 
 }

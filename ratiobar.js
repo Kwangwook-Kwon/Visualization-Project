@@ -18,7 +18,6 @@ function draw_ratio_chart(data) {
     }
 
     var botData = [key.length, bot_cnt]; // here are the data values; v1 = total, v2 = current value
-    console.log(botData)
   
     var chart = d3.select("body").append('div').attr('class', 'ratioArea').append("svg") // creating the svg object inside the container div
         .attr("class", "chart")

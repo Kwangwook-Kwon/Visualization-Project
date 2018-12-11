@@ -24,6 +24,5 @@ function draw_line_graph(data){
         };
       });
 
-      console.log(lineTimeDate[0])
 
 }
