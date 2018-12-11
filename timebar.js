@@ -3,14 +3,11 @@ var parseDate = d3.timeParse("%d-%b-%Y")
 function initial_draw_bar(selected_file, isFirst) {
     d3.json("./Twitter_Data/RetweetNew/" + selected_file + ".json").then(draw_bar_chart)
 
-    if (!isFirst) {
-        d3.selectAll(".barChart").remove();
-    }
 }
 
 function draw_bar_chart(data) {
 
-    d3.selectAll(".barChart").remove();
+    d3.selectAll(".barChart").transition().duration(500).style('opacity', 0).transition().delay(1500).remove()
 
     let key = Object.keys(data)
     let date = [];
@@ -91,33 +88,37 @@ function draw_bar_chart(data) {
     svg.selectAll("bar")
         .data(dataset)
         .enter().append("rect")
+        .style('opacity',0)
         .transition()
-        .delay(function (d, i) {
-            return i * 100;
-        })
+        //.delay(function (d, i) {
+        //    return i * 100;
+        //})
         .duration(300)
         .attr('id', d => d.key)
         .style("fill", "steelblue")
         .attr("x", function (d) { return x(d.key); })
         .attr("width", x.bandwidth())
         .attr("y", function (d) { return y(d.values); })
-        .attr("height", function (d) { return height - y(d.values); });
+        .attr("height", function (d) { return height - y(d.values); })
+        .transition().delay(200).duration(500).style('opacity', 1)
 
 
     svg.selectAll("bar")
         .data(dataset_for_bot)
         .enter().append("rect")
+        .style('opacity',0)
         .transition()
-        .delay(function (d, i) {
-            return i * 100;
-        })
+        //.delay(function (d, i) {
+        //    return i * 100;
+        //})
         .duration(300)
         .attr('id', d => d.key)
         .style("fill", "#E31A1C")
         .attr("x", function (d) { return x(d.key); })
         .attr("width", x.bandwidth())
         .attr("y", function (d) { return y(d.values); })
-        .attr("height", function (d) { return height - y(d.values) });
+        .attr("height", function (d) { return height - y(d.values) })
+        .transition().delay(200).duration(500).style('opacity', 1)
 
     svg.selectAll('rect').on('mouseover',function(){
         update_tree_from_bar(this.id);
