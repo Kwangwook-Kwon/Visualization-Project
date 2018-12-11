@@ -53,9 +53,6 @@ function draw_bar_chart(data) {
         .attr("transform",
           "translate(" + margin.left + "," + margin.top + ")");
 
-    
-
-    
     x.domain(dataset.map(function(d) { return d.key; }));
     y.domain([0, d3.max(dataset, function(d) { return d.values; })]);
   
@@ -82,6 +79,10 @@ function draw_bar_chart(data) {
     svg.selectAll("bar")
         .data(dataset)
         .enter().append("rect")
+        .transition()
+        .delay(function (d, i) {
+            return i * 100;})
+        .duration(300)
         .style("fill", "steelblue")
         .attr("x", function(d) { return x(d.key); })
         .attr("width", x.bandwidth())

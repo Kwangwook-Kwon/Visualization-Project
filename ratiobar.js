@@ -32,6 +32,10 @@ function draw_ratio_chart(data) {
     chart.selectAll("rect") // this is what actually creates the bars
         .data(botData)
         .enter().append("rect")
+        .transition()
+        .delay(function (d, i) {
+            return i * 300;})
+        .duration(300)
         .attr("width", x)
         .attr("height", 30)
         .attr("rx", 5) // rounded corners
