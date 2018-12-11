@@ -1,6 +1,6 @@
 var pie_color = d3.scaleOrdinal()
-  ///.range
-  pie_color = {"06:00-12:00" : '#00BED1', "12:00-18:00"  :'#1675B6', "18:00-24:00"  :'#E6AB02', "00:00-06:00" :'#666666'};
+///.range
+pie_color = { "06:00-12:00": '#00BED1', "12:00-18:00": '#1675B6', "18:00-24:00": '#E6AB02', "00:00-06:00": '#666666' };
 
 let cnt_00_06 = 0;
 let cnt_06_12 = 0;
@@ -30,9 +30,9 @@ function initial_draw_pie_chart(data) {
 }
 
 function update_pie_chart(data) {
-  
-  pie_svg.transition().duration(1000).style('opacity',0).transition().delay(1500).remove()
-  
+
+  pie_svg.transition().duration(1000).style('opacity', 0).transition().delay(1500).remove()
+
   cnt_00_06 = 0;
   cnt_06_12 = 0;
   cnt_12_18 = 0;
@@ -50,19 +50,24 @@ function prepare_pie_data(data) {
 
   for (i = 0; i < key.length; i++) {
     let time = data[key[i]].time.substring(11, 13);
+    let id;
+    if (data[key[i]].tweet != null)
+      id = data[key[i]].tweet;
+    else
+      id = data[key[i]].id;
 
     if (time >= 0 && time < 6) {
       cnt_00_06++;
-      nodes_00_06.push(key[i]);
+      nodes_00_06.push(id);
     } else if (time >= 6 && time < 12) {
       cnt_06_12++;
-      nodes_06_12.push(key[i]);
+      nodes_06_12.push(id);
     } else if (time >= 12 && time < 18) {
       cnt_12_18++;
-      nodes_12_18.push(key[i]);
+      nodes_12_18.push(id);
     } else if (time >= 18 && time < 24) {
       cnt_18_24++;
-      nodes_18_24.push(key[i]);
+      nodes_18_24.push(id);
     }
   }
   dataset = [{ name: "00:00-06:00", total: cnt_00_06, percent: (cnt_00_06 / key.length) * 100, nodes: nodes_00_06 },
@@ -91,7 +96,7 @@ function draw_pie_chart() {
     .attr("width", width)
     .attr("height", height)
     .attr("class", "piechart")
-  var pie_g =  pie_svg.append("g")
+  var pie_g = pie_svg.append("g")
     .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
   var g = pie_g.selectAll(".arc").append("g")
@@ -113,18 +118,18 @@ function draw_pie_chart() {
     });
 
   g.append("image")
-  .attr("id", d => "PIE" + d.data.name.substring(0, 2))
-  .attr("xlink:href", function (d) {
+    .attr("id", d => "PIE" + d.data.name.substring(0, 2))
+    .attr("xlink:href", function (d) {
       if (d.data.name == "00:00-06:00")
-      return "./image/moon.png";
-     if (d.data.name == "06:00-12:00")
-       return "./image/sunrise.png";
+        return "./image/moon.png";
+      if (d.data.name == "06:00-12:00")
+        return "./image/sunrise.png";
       if (d.data.name == "12:00-18:00")
         return "./image/sun.png";
       if (d.data.name == "18:00-24:00")
         return "./image/sunset.png";
     }).style("opacity", 0)
-    .transition()    
+    .transition()
     .delay(1000)
     .duration(1000)
     .attr("height", 40)
