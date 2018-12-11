@@ -1,3 +1,5 @@
+var parseDate = d3.timeParse("%d-%b-%Y")
+
 function initial_draw_bar(selected_file, isFirst) {
     d3.json("./Twitter_Data/RetweetNew/" + selected_file + ".json").then(draw_bar_chart)
 
@@ -25,7 +27,6 @@ function draw_bar_chart(data) {
         width = 600 - margin.left - margin.right,
         height = 500 - margin.top - margin.bottom;
 
-    var parseDate = d3.timeParse("%d-%b-%Y")
 
     var x = d3.scaleBand().rangeRound([0, width], .05).padding(0.1);
     var y = d3.scaleLinear().range([height, 0]);
@@ -64,9 +65,6 @@ function draw_bar_chart(data) {
         .attr("transform",
             "translate(" + margin.left + "," + margin.top + ")");
 
-
-
-
     x.domain(dataset.map(function (d) { return d.key; }));
     y.domain([0, d3.max(dataset, function (d) { return d.values; })]);
 
@@ -95,24 +93,38 @@ function draw_bar_chart(data) {
         .enter().append("rect")
         .transition()
         .delay(function (d, i) {
-            return i * 100;})
+            return i * 100;
+        })
         .duration(300)
+        .attr('id', d => d.key)
         .style("fill", "steelblue")
         .attr("x", function (d) { return x(d.key); })
         .attr("width", x.bandwidth())
         .attr("y", function (d) { return y(d.values); })
         .attr("height", function (d) { return height - y(d.values); });
 
-        svg.selectAll("bar")
+
+    svg.selectAll("bar")
         .data(dataset_for_bot)
         .enter().append("rect")
         .transition()
         .delay(function (d, i) {
-            return i * 100;})
+            return i * 100;
+        })
         .duration(300)
+        .attr('id', d => d.key)
         .style("fill", "#E31A1C")
         .attr("x", function (d) { return x(d.key); })
         .attr("width", x.bandwidth())
         .attr("y", function (d) { return y(d.values); })
-        .attr("height", function (d) { return height - y(d.values); });
+        .attr("height", function (d) { return height - y(d.values) });
+
+    svg.selectAll('rect').on('mouseover',function(){
+        update_tree_from_bar(this.id);
+    })
+
+    svg.selectAll('rect').on('mouseleave',function(){
+        reset_nodes();
+    })
+
 }

@@ -1,5 +1,6 @@
 var pie_color = d3.scaleOrdinal()
-  .range(['#ff9896', '#aec7e8', '#ffbb78', '#c5b0d5']);
+  ///.range
+  pie_color = {"06:00-12:00" : '#00BED1', "12:00-18:00"  :'#1675B6', "18:00-24:00"  :'#E6AB02', "00:00-06:00" :'#666666'};
 
 let cnt_00_06 = 0;
 let cnt_06_12 = 0;
@@ -99,7 +100,7 @@ function draw_pie_chart() {
 
   g.append("path")
     .attr("id", d => "PIE" + d.data.name.substring(0, 2))
-    .style("fill", function (d) { return pie_color(d.data.name); })
+    .style("fill", function (d) { return pie_color[d.data.name]; })
     .transition()
     .delay(1000)
     .duration(1000)
@@ -133,14 +134,14 @@ function draw_pie_chart() {
       return "translate(" + (+center[0] - 20) + "," + (center[1] - 20) + ")";
     }).transition().style("opacity", 1)
 
-  d3.selectAll("path, image").on("mousemove", function (d) {
+  g.selectAll("path, image").on("mousemove", function (d) {
     div.style("left", d3.event.pageX + 10 + "px");
     div.style("top", d3.event.pageY - 25 + "px");
     div.style("display", "inline-block").moveToFront();
     div.html((d.data.name) + "<br>" + (d.data.total) + "<br>" + (Math.ceil(d.data.percent)) + "%");
   });
 
-  d3.selectAll("path, image").on("mouseover", function (d) {
+  g.selectAll("path, image").on("mouseover", function (d) {
     d3.select('body').select("#nodes").selectAll('circle').style("opacity", 0.3)
     d.data.nodes.forEach(function (d) {
       d3.select('body').select("#nodes").select("#ID" + d).attr("r", 3).style("opacity", 1).attr("fill", function (d) {
@@ -152,7 +153,7 @@ function draw_pie_chart() {
     });
   });
 
-  d3.selectAll("path, image").on("mouseout", function (d) {
+  g.selectAll("path, image").on("mouseout", function (d) {
     div.style("display", "none");
     reset_nodes();
   });
