@@ -37,6 +37,7 @@ let loaded = 0
 let file_list = [];
 
 function initial_draw_tree(selected_file) {
+  console.log("Test1")
   d3.json(("Twitter_Data/RetweetNew/" + selected_file + ".json").toString()).then(draw_force_directed_graph)
 }
 
@@ -45,12 +46,14 @@ function select_update_tree(selected_file) {
 }
 
 function draw_force_directed_graph(data) {
+  console.log("test2")
   input_data = data
   initialize_graph()
 }
 
 
 function initialize_graph() {
+  console.log("test3")
   loaded = 0
   key = Object.keys(input_data)
 
