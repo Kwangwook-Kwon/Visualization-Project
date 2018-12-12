@@ -15,7 +15,8 @@ function draw_bar_chart(data) {
 
     for (i = 0; i < key.length; i++) {
         let month = data[key[i]].time.substring(4, 7);
-        date.push(data[key[i]].time.substring(8, 10) + "-" + data[key[i]].time.substring(4, 7) + "-2018");
+        if (data[key[i]].bot == 0)
+            date.push(data[key[i]].time.substring(8, 10) + "-" + data[key[i]].time.substring(4, 7) + "-2018");
         if (data[key[i]].bot == 1)
             date_for_bot.push(data[key[i]].time.substring(8, 10) + "-" + data[key[i]].time.substring(4, 7) + "-2018");
     }
@@ -63,7 +64,7 @@ function draw_bar_chart(data) {
             "translate(" + margin.left + "," + margin.top + ")");
 
     x.domain(dataset.map(function (d) { return d.key; }));
-    y.domain([0, d3.max(dataset, function (d) { return d.values; })]);
+    y.domain([0, d3.max(dataset, function (d) { return  d.values;}) + d3.max( dataset_for_bot, function(d){ return d.values; })]);
 
     svg.append("g")
         .attr("class", "x axis")
@@ -94,12 +95,18 @@ function draw_bar_chart(data) {
         //    return i * 100;
         //})
         .duration(300)
-        .attr('id', d => d.key)
+        .attr('id', d => d.key +'hum')
         .style("fill", "steelblue")
         .attr("x", function (d) { return x(d.key); })
         .attr("width", x.bandwidth())
-        .attr("y", function (d) { return y(d.values); })
-        .attr("height", function (d) { return height - y(d.values); })
+        .attr("y", function (d,i) { 
+            for(let i =0; i < dataset_for_bot.length; i++ ){
+                if(dataset_for_bot[i].key - d.key == 0){
+                    return y(d.values) -(height - y(dataset_for_bot[i].values));
+                }
+            }
+            return y(d.values); })
+        .attr("height", function (d,i) { return height - y(d.values); })
         .transition().delay(200).duration(500).style('opacity', 1)
 
 
@@ -112,7 +119,7 @@ function draw_bar_chart(data) {
         //    return i * 100;
         //})
         .duration(300)
-        .attr('id', d => d.key)
+        .attr('id', d => d.key +'bot')
         .style("fill", "#E31A1C")
         .attr("x", function (d) { return x(d.key); })
         .attr("width", x.bandwidth())

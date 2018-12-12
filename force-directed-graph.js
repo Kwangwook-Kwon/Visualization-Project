@@ -449,11 +449,16 @@ function brushended() {
 }
 
 function update_tree_from_bar(id){
+  let bot;
   d3.select('body').select("#nodes").selectAll('circle').style("opacity", 0.3)
   let targetDate=parseDate(id.substring(8,10)+'-'+id.substring(4,7)+'-2018');
-
+  if(id.substring(44,47) == 'bot')
+    bot = 1;
+  else
+    bot = 0;
+    
   nodes.forEach(function(d){
-    if(parseDate(d.time.substring(8, 10) + "-" + d.time.substring(4, 7)+'-2018') - targetDate == 0 ){
+    if(parseDate(d.time.substring(8, 10) + "-" + d.time.substring(4, 7)+'-2018') - targetDate == 0 && d.bot == bot ){
       d3.select('body').select("#nodes").select("#ID" + d.id).attr("r", 3).style("opacity", 1).attr("fill", function (d) {
         if (d.bot == 1)
           return d3.color('red').brighter(1);
