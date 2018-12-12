@@ -37,7 +37,7 @@ let loaded = 0
 let file_list = [];
 
 function initial_draw_tree(selected_file) {
-  d3.json("Twitter_Data/RetweetNew/" + selected_file + ".json").then(draw_force_directed_graph)
+  d3.json(("Twitter_Data/RetweetNew/" + selected_file + ".json").toString()).then(draw_force_directed_graph)
 }
 
 function select_update_tree(selected_file) {
