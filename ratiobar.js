@@ -44,12 +44,19 @@ function update_ratio_chart(data) {
 
     chart.selectAll("text")
         .data(botData)
+        .style('opacity', 0)
         .attr("x", xText)
         .attr("y", 10)
         .attr("dx", -3)
         .attr("dy", ".35em")
         .attr("text-anchor", "end")
         .text(String)
+        .attr("x", function(d,i){ 
+            if(i==0)
+                return +xText(botData[1])+40;
+            else 
+                return +xText(botData[1])-10;
+        }).transition().delay(1000).style('opacity', 1)
 }
 
 function draw_ratio_chart(data) {
@@ -118,19 +125,20 @@ function draw_ratio_chart(data) {
     chart.selectAll("text")
         .data(botData)
         .enter().append("text")
-        .attr("x", xText)
+        .attr('id',function(d,i){return i;})
+        .attr("x", function(d,i){ 
+            if(i==0)
+                return +xText(botData[1])+40;
+            else 
+                return +xText(botData[1])-10;
+        })
         .attr("y", 10)
         .attr("dx", -3)
         .attr("dy", ".35em")
         .attr("text-anchor", "end")
         .text(String)
-        .style('fill', function (d, i) {
-            if (i == 0) {
-                return 'white';
-            } else {
-                return 'white';
-            }
-        }).style('opacity', 0)
+        .style('fill', 'white')
+        .style('opacity', 0)
         .transition().delay(1000).duration(1000).style('opacity', 1)
 
 }
