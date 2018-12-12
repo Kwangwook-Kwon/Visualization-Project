@@ -13,6 +13,7 @@ let nodes_18_24 = [];
 let dataset;
 let pie_svg;
 let div = d3.select("body").append("div").attr("class", "toolTip");
+d3.select("body").append('div').attr('class', 'pieArea')
 
 function initial_draw_pie(selected_file) {
   d3.json("./Twitter_Data/RetweetNew/" + selected_file + ".json").then(initial_draw_pie_chart)
@@ -31,7 +32,7 @@ function initial_draw_pie_chart(data) {
 
 function update_pie_chart(data) {
 
-  pie_svg.transition().duration(1000).style('opacity', 0).transition().delay(1500).remove()
+  pie_svg.transition().duration(500).style('opacity', 0).transition().remove()
 
   cnt_00_06 = 0;
   cnt_06_12 = 0;
@@ -92,10 +93,11 @@ function draw_pie_chart() {
     .endAngle(3.1 * Math.PI)
     .value(function (d) { return d.total; });
 
-  pie_svg = d3.select("body").append('div').attr('class', 'pieArea').append("svg")
+  pie_svg = d3.select(".pieArea").append("svg")
     .attr("width", width)
     .attr("height", height)
     .attr("class", "piechart")
+
   var pie_g = pie_svg.append("g")
     .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
