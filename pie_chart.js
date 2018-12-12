@@ -1,6 +1,6 @@
 var pie_color = d3.scaleOrdinal()
 ///.range
-pie_color = { "06:00-12:00": '#00BED1', "12:00-18:00": '#1675B6', "18:00-24:00": '#E6AB02', "00:00-06:00": '#666666' };
+pie_color = { "06:00-12:00": '#00BED1', "12:00-18:00": d3.color('#1675B6').brighter(1), "18:00-24:00": '#E6AB02', "00:00-06:00": '#666666' };
 
 let cnt_00_06 = 0;
 let cnt_06_12 = 0;
@@ -12,7 +12,7 @@ let nodes_12_18 = [];
 let nodes_18_24 = [];
 let dataset;
 let pie_svg;
-let div = d3.select("body").append("div").attr("class", "toolTip");
+let toolTip = d3.select("body").append("div").attr("class", "toolTip");
 d3.select("body").append('div').attr('class', 'pieArea')
 
 function initial_draw_pie(selected_file) {
@@ -142,10 +142,10 @@ function draw_pie_chart() {
     }).transition().style("opacity", 1)
 
   g.selectAll("path, image").on("mousemove", function (d) {
-    div.style("left", d3.event.pageX + 10 + "px");
-    div.style("top", d3.event.pageY - 25 + "px");
-    div.style("display", "inline-block").moveToFront();
-    div.html((d.data.name) + "<br>" + (d.data.total) + "<br>" + (Math.ceil(d.data.percent)) + "%");
+    toolTip.style("left", d3.event.pageX + 10 + "px");
+    toolTip.style("top", d3.event.pageY - 25 + "px");
+    toolTip.style("display", "inline-block").moveToFront();
+    toolTip.html((d.data.name) + "<br>" + (d.data.total) + "<br>" + (Math.ceil(d.data.percent)) + "%");
   });
 
   g.selectAll("path, image").on("mouseover", function (d) {
@@ -161,7 +161,7 @@ function draw_pie_chart() {
   });
 
   g.selectAll("path, image").on("mouseout", function (d) {
-    div.style("display", "none");
+    toolTip.style("display", "none");
     reset_nodes();
   });
 

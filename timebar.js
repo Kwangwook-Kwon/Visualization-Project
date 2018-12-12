@@ -92,6 +92,7 @@ function draw_bar_chart(data) {
         .attr("dx", "-.8em")
         .attr("dy", "-.55em")
         .attr("transform", "rotate(-90)")
+        
     svg.select('#x-axis').style('opacity', 0)
         .transition()
         .delay(600).duration(1000).style('opacity', 1)
@@ -115,9 +116,6 @@ function draw_bar_chart(data) {
         .enter().append("rect")
         .style('opacity', 0)
         .transition()
-        //.delay(function (d, i) {
-        //    return i * 100;
-        //})
         .duration(300)
         .attr('id', d => d.key + 'hum')
         .style("fill", "steelblue")
@@ -140,9 +138,6 @@ function draw_bar_chart(data) {
         .enter().append("rect")
         .style('opacity', 0)
         .transition()
-        //.delay(function (d, i) {
-        //    return i * 100;
-        //})
         .duration(300)
         .attr('id', d => d.key + 'bot')
         .style("fill", "#E31A1C")
@@ -152,12 +147,19 @@ function draw_bar_chart(data) {
         .attr("height", function (d) { return height - y(d.values) })
         .transition().delay(500).duration(1000).style('opacity', 1)
 
-    svg.selectAll('rect').on('mouseover', function () {
+    svg.selectAll('rect').on('mouseover', function (d) {
+        let formatDay = d3.timeFormat("%a %d %b 2018");
         update_tree_from_bar(this.id);
+
+        toolTip.style("left", d3.event.pageX + 10 + "px");
+        toolTip.style("top", d3.event.pageY - 25 + "px");
+        toolTip.style("display", "inline-block").moveToFront();
+        toolTip.html(formatDay(d.key) + "<br>Counts : " + d.values );
     })
 
     svg.selectAll('rect').on('mouseleave', function () {
         reset_nodes();
+        toolTip.style("display", "none");
     })
 
 }

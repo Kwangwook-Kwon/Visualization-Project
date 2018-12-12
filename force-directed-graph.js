@@ -26,8 +26,8 @@ let brush = d3.brush()
   .on("brush", brushed)
   .on("end", brushended);
 
-let tooltip = d3.select("body")
-  .append("div").attr("class", "toolTip").attr("id", "toolTip")
+//let tooltip = d3.select("body")
+//  .append("div").attr("class", "toolTip").attr("id", "toolTip")
 
 let simulation = d3.forceSimulation()
 let node, nodes, link, links
@@ -277,16 +277,16 @@ function events() {
     d3.select('body').select(pie_id).style("fill", function (d) { return d3.color(pie_color[d.data.name]).darker(1); }).style("stroke", "black")
 
     highlight_parent(this.id.slice(2));
-    tooltip.style("left", d3.event.pageX + 10 + "px");
-    tooltip.style("top", function () {
+    toolTip.style("left", d3.event.pageX + 10 + "px");
+    toolTip.style("top", function () {
       if (d3.event.pageY > tree_svg_height / 2)
         return d3.event.pageY + 30 + "px";
       else
         return d3.event.pageY - 80 + "px";
     })
-    tooltip.style("display", "inline-block");
-    tooltip.html(input_data[this.id.slice(2)].time + "<br>" + input_data[this.id.slice(2)].text + "<br>" + input_data[this.id.slice(2)].screen_name);
-    tooltip.moveToFront();
+    toolTip.style("display", "inline-block");
+    toolTip.html(input_data[this.id.slice(2)].time + "<br>" + input_data[this.id.slice(2)].text + "<br>" + input_data[this.id.slice(2)].screen_name);
+    toolTip.moveToFront();
   })
 
     .on('mouseleave', function () {
@@ -297,7 +297,7 @@ function events() {
       d3.selectAll('#links').selectAll('line').attr("stroke-width", 1)
         .attr("stroke", '#999')
         .attr("opacity", 0.6)
-      tooltip.style("display", "none");
+        toolTip.style("display", "none");
     })
 }
 
@@ -456,7 +456,7 @@ function update_tree_from_bar(id){
     bot = 1;
   else
     bot = 0;
-    
+
   nodes.forEach(function(d){
     if(parseDate(d.time.substring(8, 10) + "-" + d.time.substring(4, 7)+'-2018') - targetDate == 0 && d.bot == bot ){
       d3.select('body').select("#nodes").select("#ID" + d.id).attr("r", 3).style("opacity", 1).attr("fill", function (d) {
