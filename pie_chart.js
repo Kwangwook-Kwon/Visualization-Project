@@ -1,5 +1,4 @@
 var pie_color = d3.scaleOrdinal()
-///.range
 pie_color = { "06:00-12:00": '#00BED1', "12:00-18:00": d3.color('#1675B6').brighter(1), "18:00-24:00": '#E6AB02', "00:00-06:00": '#666666' };
 
 let cnt_00_06 = 0;
@@ -164,5 +163,11 @@ function draw_pie_chart() {
     toolTip.style("display", "none");
     reset_nodes();
   });
+
+}
+
+function reset_pie(){
+  pie_svg.selectAll("path")
+  .style("fill", function (d) { return pie_color[d.data.name]; })
 
 }

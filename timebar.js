@@ -1,4 +1,6 @@
 var parseDate = d3.timeParse("%d-%b-%Y")
+let formatDay = d3.timeFormat("%a %d %b 2018");
+let formatIdDay = d3.timeFormat("%d%m2018");
 d3.select("body").append('div').attr('class', 'barArea')
 
 function initial_draw_bar(selected_file, isFirst) {
@@ -92,7 +94,7 @@ function draw_bar_chart(data) {
         .attr("dx", "-.8em")
         .attr("dy", "-.55em")
         .attr("transform", "rotate(-90)")
-        
+
     svg.select('#x-axis').style('opacity', 0)
         .transition()
         .delay(600).duration(1000).style('opacity', 1)
@@ -114,10 +116,11 @@ function draw_bar_chart(data) {
     svg.selectAll("bar")
         .data(dataset)
         .enter().append("rect")
+        .attr('class','human')
         .style('opacity', 0)
         .transition()
         .duration(300)
-        .attr('id', d => d.key + 'hum')
+        .attr('id', d => 'HUM'+formatIdDay(d.key))
         .style("fill", "steelblue")
         .attr("x", function (d) { return x(d.key); })
         .attr("width", x.bandwidth())
@@ -136,10 +139,11 @@ function draw_bar_chart(data) {
     svg.selectAll("bar")
         .data(dataset_for_bot)
         .enter().append("rect")
+        .attr('class','bot')
         .style('opacity', 0)
         .transition()
         .duration(300)
-        .attr('id', d => d.key + 'bot')
+        .attr('id', d => 'BOT'+formatIdDay(d.key))
         .style("fill", "#E31A1C")
         .attr("x", function (d) { return x(d.key); })
         .attr("width", x.bandwidth())
@@ -147,19 +151,25 @@ function draw_bar_chart(data) {
         .attr("height", function (d) { return height - y(d.values) })
         .transition().delay(500).duration(1000).style('opacity', 1)
 
-    svg.selectAll('rect').on('mouseover', function (d) {
-        let formatDay = d3.timeFormat("%a %d %b 2018");
+    svg.selectAll('rect').on('mouseover', function () {
         update_tree_from_bar(this.id);
 
-        toolTip.style("left", d3.event.pageX + 10 + "px");
-        toolTip.style("top", d3.event.pageY - 25 + "px");
-        toolTip.style("display", "inline-block").moveToFront();
-        toolTip.html(formatDay(d.key) + "<br>Counts : " + d.values );
     })
+        .on('mouseleave', function () {
+            reset_nodes();
+            toolTip.style("display", "none");
+        })
 
-    svg.selectAll('rect').on('mouseleave', function () {
-        reset_nodes();
-        toolTip.style("display", "none");
-    })
+        .on('mousemove', function (d) {
+            toolTip.style("left", d3.event.pageX + 10 + "px");
+            toolTip.style("top", d3.event.pageY - 25 + "px");
+            toolTip.style("display", "inline-block").moveToFront();
+            toolTip.html(formatDay(d.key) + "<br>Counts : " + d.values);
+        })
 
+}
+
+function reset_bar(){
+    d3.select(".barArea").selectAll("rect").selectAll('.bot').style("fill", "#E31A1C")
+    d3.select(".barArea").selectAll('.human').style("fill", "steelblue")
 }

@@ -124,7 +124,7 @@ function prepare_data() {
       child: input_data[key[i]].child,
       parent: input_data[key[i]].parent_tweet,
       bot: input_data[key[i]].bot,
-      time : input_data[key[i]].time
+      time: input_data[key[i]].time
     };
   });
 
@@ -162,7 +162,7 @@ function draw_nodes_links() {
     .data(nodes)
     .enter()
     .append("circle")
-    .attr("class","unbrushed")
+    .attr("class", "unbrushed")
     .attr("id", d => 'ID' + d.id)
     .attr("r", function (d) {
       if (d.depth == 1)
@@ -270,11 +270,20 @@ function ticked() {
 
 function events() {
 
-  d3.selectAll('#nodes').selectAll('circle').on('mouseover', function () {
+  d3.selectAll('#nodes').selectAll('circle').on('mouseover', function (d) {
     d3.select(this).attr("r", 10).moveToFront();
 
     let pie_id = get_pie_id(this.id.slice(2))
-    d3.select('body').select(pie_id).style("fill", function (d) { return d3.color(pie_color[d.data.name]).darker(1); }).style("stroke", "black")
+    let bar_id = formatIdDay(parseDate(d.time.substring(8, 10) + "-" + d.time.substring(4, 7) + "-2018"))
+
+    d3.select('body').select(pie_id).style("fill", function (d) { return d3.color(pie_color[d.data.name]).darker(1); })//.style("stroke", "black")
+    if (d.bot == 0) {
+      d3.select('.barChart').select('#HUM' + bar_id).style("fill", d3.color('steelblue').darker(1))
+    }
+    if (d.bot == 1) {
+      d3.select('.barChart').select('#BOT' + bar_id).style("fill", d3.color('#E31A1C').darker(1))
+    }
+
 
     highlight_parent(this.id.slice(2));
     toolTip.style("left", d3.event.pageX + 10 + "px");
@@ -289,15 +298,18 @@ function events() {
     toolTip.moveToFront();
   })
 
-    .on('mouseleave', function () {
+    .on('mouseleave', function (d) {
       reset_nodes();
-      let pie_id = get_pie_id(this.id.slice(2))
-      d3.select('body').select(pie_id).style("fill", function (d) { return pie_color[d.data.name]; }).style("stroke", "white")
+      reset_pie();
+      reset_bar();
+      //let pie_id = get_pie_id(this.id.slice(2))
+      //d3.select('body').select(pie_id).style("fill", function (d) { return pie_color[d.data.name]; }).style("stroke", "white")
+      //d3.select('body').select(pie_id).style("fill", function (d) { return d3.color(pie_color[d.data.name]).darker(1); }).style("stroke", "black")
 
       d3.selectAll('#links').selectAll('line').attr("stroke-width", 1)
         .attr("stroke", '#999')
         .attr("opacity", 0.6)
-        toolTip.style("display", "none");
+      toolTip.style("display", "none");
     })
 }
 
@@ -388,7 +400,7 @@ function change_tree_mode() {
     zoom_handler(tree_svg);
     tree_svg.style('cursor', 'move')
     reset_nodes();
-    tree_svg.selectAll('circle').attr('class','unbrushed')
+    tree_svg.selectAll('circle').attr('class', 'unbrushed')
     update_pie_chart(input_data)
     tree_svg.selectAll("#brush").remove()
   } else {
@@ -437,28 +449,31 @@ function isBrushed(brush_coords, cx, cy) {
 }
 
 function brushended() {
-  let d_brushed =  d3.selectAll(".brushed").data();
-  if (!d3.event.selection || d_brushed.length == 0 ) {
+  let d_brushed = d3.selectAll(".brushed").data();
+  if (!d3.event.selection || d_brushed.length == 0) {
     update_pie_chart(input_data)
     draw_bar_chart(input_data)
     tree_svg.selectAll('circle').attr("class", "unbrushed");
-  }else{
-      update_pie_chart(d_brushed) 
-      draw_bar_chart(d_brushed)
+  } else {
+    update_pie_chart(d_brushed)
+    draw_bar_chart(d_brushed)
   }
 }
 
-function update_tree_from_bar(id){
+function update_tree_from_bar(id) {
   let bot;
+  let parser = d3.timeParse("%d-%m-%Y")
   d3.select('body').select("#nodes").selectAll('circle').style("opacity", 0.3)
-  let targetDate=parseDate(id.substring(8,10)+'-'+id.substring(4,7)+'-2018');
-  if(id.substring(44,47) == 'bot')
+  console.log(id)
+  console.log(id.substring(0,3))
+  let targetDate = parser(id.substring(3, 5) + '-' + id.substring(5, 7) + '-2018');
+  if (id.substring(0, 3) == 'BOT')
     bot = 1;
   else
     bot = 0;
 
-  nodes.forEach(function(d){
-    if(parseDate(d.time.substring(8, 10) + "-" + d.time.substring(4, 7)+'-2018') - targetDate == 0 && d.bot == bot ){
+  nodes.forEach(function (d) {
+    if (parseDate(d.time.substring(8, 10) + "-" + d.time.substring(4, 7) + '-2018') - targetDate == 0 && d.bot == bot) {
       d3.select('body').select("#nodes").select("#ID" + d.id).attr("r", 3).style("opacity", 1).attr("fill", function (d) {
         if (d.bot == 1)
           return d3.color('red').brighter(1);
