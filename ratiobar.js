@@ -11,12 +11,12 @@ function initial_draw_ratio(selected_file, isFirst) {
 
 let raio_area = d3.select("body").append('div').attr('class', 'ratioArea')
 
-function update_ratio(data) {
-    //chart.transition().duration(500).style('opacity', 0).transition().remove()
-    update_chart(data)
+function update_ratio(selected_file) {
+    d3.json("Twitter_Data/RetweetNew/" + selected_file + ".json").then(update_ratio_chart)
+    //update_chart(data)
 }
 
-function update_chart(data) {
+function update_ratio_chart(data) {
     let key = Object.keys(data)
     let bot_cnt = 0;
 
@@ -85,7 +85,7 @@ function draw_ratio_chart(data) {
         .attr("height", 30)
         .attr("width", 30)
         .style('opacity', 0)
-        .transition().delay(500).duration(1000).style('opacity', 1)
+        .transition().delay(1000).duration(1000).style('opacity', 1)
 
 
     chart.append("image")
@@ -95,17 +95,12 @@ function draw_ratio_chart(data) {
         .attr("width", 30)
         .attr("x", 350)
         .style('opacity', 0)
-        .transition().delay(500).duration(1000).style('opacity', 1)
+        .transition().delay(1000).duration(1000).style('opacity', 1)
 
     chart.selectAll("rect")
         .data(botData)
         .enter().append("rect")
         .style('opacity', 0)
-        .transition()
-        .delay(function (d, i) {
-            return i * 200;
-        })
-        .duration(300)
         .attr("width", d => x(d))
         .attr("height", 30)
         .attr("rx", 5)
@@ -118,7 +113,7 @@ function draw_ratio_chart(data) {
             } else {
                 return '#E31A1C';
             }
-        }).transition().delay(500).duration(1000).style('opacity', 1)
+        }).transition().delay(1000).duration(1000).style('opacity', 1)
 
     chart.selectAll("text")
         .data(botData)
@@ -136,6 +131,6 @@ function draw_ratio_chart(data) {
                 return 'white';
             }
         }).style('opacity', 0)
-        .transition().delay(500).duration(1000).style('opacity', 1)
+        .transition().delay(1000).duration(1000).style('opacity', 1)
 
 }

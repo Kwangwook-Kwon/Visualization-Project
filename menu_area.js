@@ -27,5 +27,5 @@ function onchange_combobox() {
     select_update_tree(selectValue)
     update_pie(selectValue);
     initial_draw_bar(selectValue, false);
-    initial_draw_ratio(selectValue, false);
+    update_ratio(selectValue, false);
 };

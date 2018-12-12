@@ -456,12 +456,12 @@ function brushended() {
   if (!d3.event.selection || d_brushed.length == 0) {
     update_pie_chart(input_data)
     draw_bar_chart(input_data)
-    update_ratio(input_data)
+    update_ratio_chart(input_data)
     tree_svg.selectAll('circle').attr("class", "unbrushed");
   } else {
     update_pie_chart(d_brushed)
     draw_bar_chart(d_brushed)
-    update_ratio(d_brushed)
+    update_ratio_chart(d_brushed)
   }
 }
 
