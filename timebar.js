@@ -4,7 +4,7 @@ let formatIdDay = d3.timeFormat("%d%m2018");
 d3.select("body").append('div').attr('class', 'barArea')
 
 function initial_draw_bar(selected_file, isFirst) {
-    d3.json("./Twitter_Data/RetweetNew/" + selected_file + ".json").then(draw_bar_chart)
+    d3.json("Twitter_Data/RetweetNew/" + selected_file + ".json").then(draw_bar_chart)
 
 }
 

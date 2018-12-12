@@ -15,11 +15,11 @@ let toolTip = d3.select("body").append("div").attr("class", "toolTip");
 d3.select("body").append('div').attr('class', 'pieArea')
 
 function initial_draw_pie(selected_file) {
-  d3.json("./Twitter_Data/RetweetNew/" + selected_file + ".json").then(initial_draw_pie_chart)
+  d3.json("Twitter_Data/RetweetNew/" + selected_file + ".json").then(initial_draw_pie_chart)
 }
 
 function update_pie(selected_file) {
-  d3.json("./Twitter_Data/RetweetNew/" + selected_file + ".json").then(update_pie_chart)
+  d3.json("Twitter_Data/RetweetNew/" + selected_file + ".json").then(update_pie_chart)
 }
 
 function initial_draw_pie_chart(data) {

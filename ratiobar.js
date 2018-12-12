@@ -1,5 +1,5 @@
 function initial_draw_ratio(selected_file, isFirst) {
-    d3.json("./Twitter_Data/RetweetNew/" + selected_file + ".json").then(draw_ratio_chart)
+    d3.json("Twitter_Data/RetweetNew/" + selected_file + ".json").then(draw_ratio_chart)
 
     if (!isFirst) {
         d3.selectAll(".chart").remove();
